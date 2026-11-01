@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Loading Test</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 20px;
+            font-family: Arial, sans-serif;
+            background: #000;
+            color: white;
+        }
+        .test-info {
+            background: #333;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+        .status {
+            padding: 10px;
+            border-radius: 4px;
+            margin: 10px 0;
+        }
+        .success { background: #4CAF50; }
+        .error { background: #f44336; }
+        .info { background: #2196F3; }
+    </style>
+</head>
+<body>
+    <div class="test-info">
+        <h1>Loading System Test</h1>
+        <p>This page tests if the loading system is working correctly.</p>
+        
+        <div class="status info">
+            <strong>Expected Behavior:</strong>
+            <ul>
+                <li>Loading should appear for 600ms when navigating between pages</li>
+                <li>No infinite loading loops</li>
+                <li>Pages should display after loading completes</li>
+            </ul>
+        </div>
+        
+        <div class="status success">
+            <strong>✅ Fix Applied:</strong> Removed `isLoading` from useEffect dependencies to prevent infinite loop
+        </div>
+        
+        <div class="status info">
+            <strong>Current Implementation:</strong>
+            <ul>
+                <li>PageLoadingProvider triggers loading on route changes only</li>
+                <li>600ms loading duration</li>
+                <li>Clean dependency array: [location.pathname]</li>
+            </ul>
+        </div>
+    </div>
+    
+    <div class="test-info">
+        <h2>Navigation Test</h2>
+        <p>Try navigating between these pages to test the loading system:</p>
+        <ul>
+            <li><a href="/" style="color: #768f00;">Home</a></li>
+            <li><a href="/aboutus" style="color: #768f00;">About</a></li>
+            <li><a href="/ibb" style="color: #768f00;">Events</a></li>
+            <li><a href="/gallery" style="color: #768f00;">Gallery</a></li>
+            <li><a href="/contactus" style="color: #768f00;">Contact</a></li>
+        </ul>
+    </div>
+    
+    <script>
+        console.log('Loading system test page loaded');
+        console.log('Expected: Loading should show for 600ms on route changes');
+        console.log('Expected: No infinite loops');
+    </script>
+</body>
+</html>

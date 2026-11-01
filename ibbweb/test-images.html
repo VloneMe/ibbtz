@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Image Test</title>
+    <style>
+        body {
+            background: #1a1a1a;
+            color: white;
+            font-family: sans-serif;
+            padding: 20px;
+        }
+        .test-container {
+            margin: 20px 0;
+            padding: 20px;
+            border: 2px solid #768f00;
+            background: #2a2a2a;
+        }
+        img {
+            max-width: 300px;
+            height: 200px;
+            object-fit: cover;
+            border: 2px solid #768f00;
+            margin: 10px;
+        }
+        .error {
+            color: red;
+        }
+        .success {
+            color: #768f00;
+        }
+    </style>
+</head>
+<body>
+    <h1>Image Path Test</h1>
+    
+    <div class="test-container">
+        <h2>Test 1: Direct paths (WILL FAIL)</h2>
+        <p class="error">These paths won't work in Vite:</p>
+        <img src="/src/assets/ibb1.jpg" alt="Wrong path" onerror="this.nextElementSibling.textContent='❌ FAILED'">
+        <p class="error">Status: Loading...</p>
+    </div>
+    
+    <div class="test-container">
+        <h2>Test 2: Relative paths from public folder</h2>
+        <p>If images are in public folder:</p>
+        <img src="/impactlogo.jpeg" alt="Public folder" onload="this.nextElementSibling.textContent='✅ SUCCESS'" onerror="this.nextElementSibling.textContent='❌ FAILED'">
+        <p>Status: Loading...</p>
+    </div>
+    
+    <div class="test-container">
+        <h2>Instructions for Gallery Page</h2>
+        <ol>
+            <li>Open the Gallery page in your browser</li>
+            <li>Open Developer Console (F12 or Right-click → Inspect)</li>
+            <li>Go to the Console tab</li>
+            <li>Look for these messages:
+                <ul>
+                    <li>"API not available, using mock data"</li>
+                    <li>"Mock data response:"</li>
+                    <li>"Media items loaded: 12"</li>
+                    <li>"First media item:"</li>
+                    <li>"First media URL:"</li>
+                </ul>
+            </li>
+            <li>Check what URL is being generated</li>
+            <li>Go to the Network tab</li>
+            <li>Refresh the page</li>
+            <li>Look for image requests (filter by "Img")</li>
+            <li>Check if images are returning 404 or 200 status</li>
+        </ol>
+    </div>
+    
+    <div class="test-container">
+        <h2>Common Issues</h2>
+        <ul>
+            <li><strong>Images showing as broken:</strong> URL paths are incorrect</li>
+            <li><strong>Images loaded but invisible:</strong> CSS issue (opacity, z-index, color)</li>
+            <li><strong>404 errors:</strong> Files not found at the specified path</li>
+            <li><strong>CORS errors:</strong> Cross-origin request blocked</li>
+        </ul>
+    </div>
+</body>
+</html>
+
