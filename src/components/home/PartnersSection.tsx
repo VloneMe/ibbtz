@@ -1,7 +1,7 @@
 import { motion } from 'framer-motion';
 import { Container } from '../../common/Container';
 
-import partiner1 from '@/assets/partiners/somakwanza.jpeg';
+import partiner1 from '@/assets/partiners/somakwanza.png';
 import partiner2 from '@/assets/partiners/impactadvisory.png';
 
 // Animation variants
@@ -59,7 +59,7 @@ const PartnersSection = () => {
               variants={fadeInUp} 
               className="bg-[oklch(0.473_0.137_46.201)]/20 p-6 rounded-lg border border-[oklch(0.473_0.137_46.201)]/30 text-center hover:bg-[oklch(0.473_0.137_46.201)]/30 transition-colors"
             >
-              <div className="text-4xl mb-3 bg-white rounded-lg p-5">
+              <div className="text-4xl mb-3 rounded-lg p-5">
                 <a href={partner.url} target="_blank" rel="noopener noreferrer">
                   <img src={partner.logo} alt={partner.name} className="w-full h-full object-cover" />
                 </a>

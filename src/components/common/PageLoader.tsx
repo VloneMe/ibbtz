@@ -53,7 +53,7 @@ const PageLoader: React.FC<PageLoaderProps> = ({
               <img 
                 src={impactLogo}
                 alt="Loading..."
-                className="w-full h-full object-contain bg-white p-2 rounded-lg"
+                className="w-full h-full object-contain p-2"
               />
             </div>
 

@@ -30,7 +30,7 @@ export const Logo = ({
   };
 
   return (
-    <div className={`flex items-center gap-3 bg-white rounded-lg p-2 px-5 ${className}`}>
+    <div className={`flex items-center gap-3 p-2 px-5 ${className}`}>
       <img 
         src={ibbLogo}
         alt="IBB+ Logo - Ideals Beyond Ideas"
