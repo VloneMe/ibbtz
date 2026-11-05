@@ -3,7 +3,6 @@ export { default as HeroSection } from './HeroSection';
 export { default as QuoteAboutSection } from './QuoteAboutSection';
 export { default as ImageShowcaseCarousel } from './ImageShowcaseCarousel';
 export { default as ImageCarousel } from './ImageCarousel';
-export { default as WhyAttendSection } from './WhyAttendSection';
 export { default as VisionMissionSection } from './VisionMissionSection';
 export { default as EventDateSection } from './EventDateSection';
 export { default as WhoShouldAttendSection } from './WhoShouldAttendSection';

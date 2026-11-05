@@ -10,7 +10,6 @@ import {
   HeroSection,
   QuoteAboutSection,
   ImageShowcaseCarousel,
-  WhyAttendSection,
   VisionMissionSection,
   WhoShouldAttendSection,
   EventHighlightsSection,
@@ -196,9 +195,6 @@ const EventDetailPage = () => {
 
         {/* Image Showcase Carousel Section */}
         <ImageShowcaseCarousel images={eventDateCarouselImages} />
-
-        {/* Why Attend Section */}
-        <WhyAttendSection />
 
         {/* Vision, Mission, Objectives Section */}
         <VisionMissionSection />
