@@ -121,8 +121,8 @@ export const generateOpenGraphTags = (page: keyof typeof seoConfig.pages) => {
     'og:url': pageConfig.url,
     'og:title': pageConfig.title,
     'og:description': pageConfig.description,
-    'og:image': 'https://ibb.impactadvisory.co.tz/impactlogo.png',
-    'og:image:secure_url': 'https://ibb.impactadvisory.co.tz/impactlogo.png',
+    'og:image': 'https://ibbplus.com/og-home.jpg',
+    'og:image:secure_url': 'https://ibbplus.com/og-home.jpg',
     'og:image:width': '1200',
     'og:image:height': '630',
     'og:image:alt': 'IBB+ Tanzania Logo',
@@ -143,7 +143,7 @@ export const generateTwitterTags = (page: keyof typeof seoConfig.pages) => {
     'twitter:url': pageConfig.url,
     'twitter:title': pageConfig.title,
     'twitter:description': pageConfig.description,
-    'twitter:image': 'https://ibb.impactadvisory.co.tz/impactlogo.png',
+    'twitter:image': 'https://ibbplus.com/og-home.jpg',
     'twitter:image:alt': 'IBB+ Tanzania Logo'
   };
 };

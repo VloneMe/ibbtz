@@ -1,76 +1,33 @@
-import { motion } from 'framer-motion';
 import { Container } from '../../common/Container';
+import Reveal from '@/components/common/Reveal';
+import somakwanza from '@/assets/partiners/somakwanza.png';
+import impactadvisory from '@/assets/partiners/impactadvisory.png';
 
-import partiner1 from '@/assets/partiners/somakwanza.png';
-import partiner2 from '@/assets/partiners/impactadvisory.png';
+const partners = [
+  { name: 'Impact Advisory', logo: impactadvisory, url: 'https://impactadvisory.co.tz' },
+  { name: 'Soma Kwanza', logo: somakwanza, url: 'https://somakwanza.tz' },
+];
 
-// Animation variants
-const staggerContainer = {
-  hidden: { opacity: 0 },
-  visible: {
-    opacity: 1,
-    transition: {
-      staggerChildren: 0.1,
-      when: "beforeChildren"
-    }
-  }
-};
-
-const fadeInUp = {
-  hidden: { y: 40, opacity: 0 },
-  visible: {
-    y: 0,
-    opacity: 1,
-    transition: { 
-      type: "spring" as const,
-      stiffness: 100,
-      damping: 10,
-      duration: 0.8
-    }
-  }
-};
-
-const PartnersSection = () => {
-  const partners = [
-    { name: "Soma Kwanza", logo: partiner1, url: "https://somakwanza.tz" },
-    { name: "Impact Advisory", logo: partiner2, url: "https://impactadvisory.co.tz" }
-  ];
-
-  return (
-    <motion.div
-      initial="hidden"
-      whileInView="visible"
-      viewport={{ once: true, margin: "-100px" }}
-      variants={staggerContainer}
-      className="py-20 bg-[#012557]/55"
-    >
-      <Container className='px-4'>
-        <motion.div variants={fadeInUp} className="text-center mb-16">
-          <h2 className="text-4xl md:text-5xl font-bold text-white">Our Partners</h2>
-          <span className="text-xl text-gray-300 max-w-3xl mx-auto">
-            We are grateful to our partners for their support and collaboration.
-          </span>
-        </motion.div>
-        
-        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-          {partners.map((partner, index) => (
-            <motion.div 
-              key={index} 
-              variants={fadeInUp} 
-              className="bg-[oklch(0.473_0.137_46.201)]/20 p-6 rounded-lg border border-[oklch(0.473_0.137_46.201)]/30 text-center hover:bg-[oklch(0.473_0.137_46.201)]/30 transition-colors"
-            >
-              <div className="text-4xl mb-3 rounded-lg p-5">
-                <a href={partner.url} target="_blank" rel="noopener noreferrer">
-                  <img src={partner.logo} alt={partner.name} className="w-full h-full object-cover" />
-                </a>
-              </div>
-              <p className="text-white text-sm font-medium leading-tight">{partner.name}</p>
-            </motion.div>
-          ))}
+const PartnersSection = () => (
+  <section className="border-y border-stone bg-ivory py-12 sm:py-14" aria-labelledby="partners-title">
+    <Container>
+      <Reveal className="flex flex-col items-center gap-8 sm:flex-row sm:justify-between">
+        <div className="text-center sm:text-left">
+          <h2 id="partners-title" className="text-xs font-semibold uppercase tracking-[0.18em] text-ink">Our partners</h2>
+          <p className="mt-1 text-sm text-ink-muted">Organisations who make the breakfast possible.</p>
         </div>
-      </Container>
-    </motion.div>
-  );
-};
+        <ul className="flex flex-wrap items-center justify-center gap-4 sm:gap-6">
+          {partners.map((p) => (
+            <li key={p.name}>
+              <a href={p.url} target="_blank" rel="noopener noreferrer" title={p.name} className="flex h-20 w-36 items-center justify-center rounded-sm border border-stone bg-white px-5 transition-colors hover:border-navy/40">
+                <img src={p.logo} alt={p.name} className="max-h-12 w-auto object-contain" loading="lazy" />
+              </a>
+            </li>
+          ))}
+        </ul>
+      </Reveal>
+    </Container>
+  </section>
+);
 
 export default PartnersSection;

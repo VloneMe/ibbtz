@@ -327,7 +327,7 @@ export default function Events() {
                     </div>
                     
                     <div className="flex flex-col sm:flex-row gap-4">
-                      <Button className="bg-[#768f00] hover:bg-[#768f00]/90 text-white px-8 py-4 text-lg rounded-full flex-1">
+                      <Button className="bg-navy hover:bg-navy-soft text-white px-8 py-4 text-lg rounded-full flex-1">
                         REGISTER NOW
                         <ArrowRight className="ml-2 h-5 w-5" />
                       </Button>
@@ -450,7 +450,7 @@ export default function Events() {
                   </div>
                   
                   <Button 
-                    className="w-full bg-[#768f00] hover:bg-[#768f00]/90 text-white rounded-full py-3 group-hover:scale-105 transition-transform duration-300"
+                    className="w-full bg-navy hover:bg-navy-soft text-white rounded-full py-3 group-hover:scale-105 transition-transform duration-300"
                     onClick={() => handleViewEvent(event)}
                   >
                     Learn More
@@ -580,7 +580,7 @@ export default function Events() {
               to build a knowledge-driven economy for Vision 2050.
             </p>
             <div className="flex flex-col sm:flex-row gap-6 justify-center">
-              <Button className="bg-[#768f00] hover:bg-[#768f00]/90 text-white px-8 py-4 text-lg rounded-full">
+              <Button className="bg-navy hover:bg-navy-soft text-white px-8 py-4 text-lg rounded-full">
                 Register for Next Event
                 <Calendar className="ml-2 h-5 w-5" />
               </Button>

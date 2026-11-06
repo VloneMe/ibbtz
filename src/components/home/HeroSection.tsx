@@ -1,122 +1,48 @@
-import { motion } from 'framer-motion';
-import { Container } from '../../common/Container';
-import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
 import { Link } from 'react-router-dom';
-import heroImage from '/src/assets/ibb.jpg';
+import { ArrowRight } from 'lucide-react';
+import { Container } from '../../common/Container';
+import hero from '@/assets/photos/hero.jpg';
 
-// Animation variants
-const staggerContainer = {
-  hidden: { opacity: 0 },
-  visible: {
-    opacity: 1,
-    transition: {
-      staggerChildren: 0.1,
-      when: "beforeChildren"
-    }
-  }
-};
+const stats = [
+  { value: '14', label: 'Editions held' },
+  { value: '50+', label: 'Leaders and speakers convened' },
+  { value: '20+', label: 'Partner organisations' },
+  { value: '2019', label: 'First breakfast' },
+];
 
-// const fadeInUp = {
-//   hidden: { y: 40, opacity: 0 },
-//   visible: {
-//     y: 0,
-//     opacity: 1,
-//     transition: { 
-//       type: "spring" as const,
-//       stiffness: 100,
-//       damping: 10,
-//       duration: 0.8
-//     }
-//   }
-// };
+const HeroSection = ({ onBecomeSponsor }: { onBecomeSponsor: () => void }) => (
+  <section className="relative isolate overflow-hidden bg-navy-deep text-white" aria-labelledby="hero-title">
+    <img src={hero} alt="" aria-hidden="true" className="absolute inset-0 h-full w-full object-cover object-center" fetchPriority="high" />
+    <div className="absolute inset-0 bg-gradient-to-r from-navy-deep via-navy-deep/85 to-navy-deep/35" />
+    <div className="absolute inset-x-0 bottom-0 h-40 bg-gradient-to-t from-navy-deep to-transparent" />
 
-interface HeroSectionProps {
-  onViewAgenda: () => void;
-}
-
-const HeroSection = ({ onViewAgenda }: HeroSectionProps) => {
-  const platformInfo = {
-    name: "Impact Business Breakfast",
-    tagline: "Ideals Beyond Ideas",
-    title: "Tanzania's Premier Business Networking Platform",
-    description: "The Impact Business Breakfast (IBB+) is a premier networking and knowledge-sharing platform that brings together industry leaders, entrepreneurs, government officials, and professionals to discuss critical issues affecting Tanzania's economic development."
-  };
-
-  return (
-    <section 
-      className="relative min-h-[70vh] flex items-center"
-      aria-label="IBB Networking Platform Hero Section"
-    >
-      {/* Background Image */}
-      <div className="absolute inset-0">
-        <img
-          src={heroImage}
-          alt="Impact Business Breakfast Tanzania - Premier business networking event in Dar es Salaam"
-          className="w-full h-full object-cover object-bottom"
-        />
-        <div className="absolute inset-0 bg-gradient-to-r from-black/80 via-black/60 to-black/40" />
+    <Container className="relative pb-16 pt-20 sm:pb-20 sm:pt-28 lg:pb-28 lg:pt-36">
+      <p className="eyebrow text-gold-soft">Impact Business Breakfast · Dar es Salaam</p>
+      <h1 id="hero-title" className="mt-6 max-w-3xl font-display text-4xl font-semibold leading-[1.08] sm:text-5xl lg:text-[3.75rem]">
+        Where Tanzania's business leaders meet to shape the economy.
+      </h1>
+      <p className="mt-6 max-w-2xl text-lg leading-relaxed text-white/80 sm:text-xl">
+        A convening platform for executives, policy makers and entrepreneurs: high-level sessions, candid debate and the partnerships that turn ideas into growth.
+      </p>
+      <div className="mt-10 flex flex-col gap-3 sm:flex-row sm:items-center">
+        <Link to="/gala" className="btn-gold">
+          Register for the Awards Gala <ArrowRight className="h-4 w-4" />
+        </Link>
+        <button type="button" onClick={onBecomeSponsor} className="btn-outline-light">Become a sponsor</button>
       </div>
-      
-      <Container className="relative z-10 pt-20">
-        <motion.div 
-          initial="hidden"
-          animate="visible"
-          variants={staggerContainer}
-          className="max-w-4xl space-y-4 px-4 sm:px-0"
-        >
-          {/* Platform Badges */}
-          <div className="flex flex-wrap gap-2 sm:gap-4">
-            <Badge className="bg-[#768f00] text-white px-3 py-1 sm:px-4 sm:py-2 font-bold text-xs sm:text-sm">
-              {platformInfo.tagline}
-            </Badge>
-            <Badge className="bg-[oklch(0.473_0.137_46.201)] text-white px-3 py-1 sm:px-4 sm:py-2 text-xs sm:text-sm">
-              Business Networking Platform
-            </Badge>
+    </Container>
+
+    <Container className="relative">
+      <dl className="grid grid-cols-2 gap-x-6 gap-y-8 border-t border-white/15 py-8 sm:py-10 lg:grid-cols-4">
+        {stats.map((s) => (
+          <div key={s.label} className="flex flex-col-reverse">
+            <dt className="mt-1 text-sm text-white/65">{s.label}</dt>
+            <dd className="font-display text-3xl font-semibold text-gold-soft sm:text-4xl">{s.value}</dd>
           </div>
-
-          {/* Main Title */}
-          <h1 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold leading-tight">
-            {platformInfo.title}
-          </h1>
-          
-          {/* Platform Description */}
-          <p className="text-base sm:text-lg md:text-xl text-gray-300 max-w-3xl leading-relaxed">
-            {platformInfo.description}
-          </p>
-
-
-          {/* Action Buttons */}
-          <div className="flex flex-col sm:flex-row gap-3 sm:gap-4">
-            <Link to="/gala">
-              <Button 
-                size="lg" 
-                className="bg-[#768f00] hover:bg-[#768f00]/90 text-white px-6 sm:px-8 py-3 sm:py-4 text-base sm:text-lg w-full sm:w-auto font-semibold"
-              >
-                REGISTER FOR GALA
-              </Button>
-            </Link>
-            <Link to="/feedback">
-              <Button 
-                size="lg" 
-                className="bg-[#012557] hover:bg-[#012557]/90 text-white px-6 sm:px-8 py-3 sm:py-4 text-base sm:text-lg w-full sm:w-auto"
-              >
-                FEEDBACK
-              </Button>
-            </Link>
-            <Button 
-              size="lg" 
-              variant="outline" 
-              className="border-[oklch(0.473_0.137_46.201)] text-[oklch(0.473_0.137_46.201)] hover:bg-[oklch(0.473_0.137_46.201)] hover:text-white px-6 sm:px-8 py-3 sm:py-4 text-base sm:text-lg w-full sm:w-auto"
-              onClick={onViewAgenda}
-            >
-              VIEW AGENDA
-            </Button>
-          </div>
-        </motion.div>
-      </Container>
-    </section>
-  );
-};
+        ))}
+      </dl>
+    </Container>
+  </section>
+);
 
 export default HeroSection;

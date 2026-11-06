@@ -1,11 +1,11 @@
 import axios, { AxiosError } from 'axios';
-import ibb1 from '@/assets/ibb1.jpg';
-import ibb2 from '@/assets/ibb2.jpg';
-import ibb3 from '@/assets/ibb3.jpg';
-import ibb4 from '@/assets/ibb4.jpg';
-import ibb5 from '@/assets/ibb5.jpg';
-import ibb6 from '@/assets/ibb6.jpg';
-import ibb7 from '@/assets/ibb7.jpg';
+import ibb1 from '@/assets/photos/audience.jpg';
+import ibb2 from '@/assets/photos/networking-1.jpg';
+import ibb3 from '@/assets/photos/presentation.jpg';
+import ibb4 from '@/assets/photos/networking-2.jpg';
+import ibb5 from '@/assets/photos/networking-3.jpg';
+import ibb6 from '@/assets/photos/group.jpg';
+import ibb7 from '@/assets/photos/speaker.jpg';
 import ibb14 from '@/assets/ibb14.jpeg';
 import ibbV1 from '@/assets/ibbV1.jpeg';
 

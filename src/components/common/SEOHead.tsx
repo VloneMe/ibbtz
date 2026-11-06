@@ -21,8 +21,8 @@ export default function SEOHead({
   title = "IBB+ Tanzania | Impact Business Breakfast - Ideals Beyond Ideas",
   description = "IBB+ (Impact Business Breakfast) is Tanzania's #1 business networking event in Dar es Salaam. Join 500+ CEOs, entrepreneurs & industry leaders monthly. Free registration. Expert speakers. Strategic partnerships.",
   keywords = "IBB+, IBB Tanzania, Impact Business Breakfast, business networking Tanzania, business events Dar es Salaam, business breakfast Tanzania, entrepreneurship Tanzania, CEO networking Tanzania",
-  image = "https://ibb.impactadvisory.co.tz/impactlogo.jpeg",
-  url = "https://ibb.impactadvisory.co.tz",
+  image = "https://ibbplus.com/og-home.jpg",
+  url = "https://ibbplus.com",
   type = "website",
   structuredData,
   // article

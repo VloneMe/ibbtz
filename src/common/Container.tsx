@@ -1,14 +1,14 @@
-import React from 'react';
+import type { ReactNode } from 'react';
 
 interface ContainerProps {
-  children: React.ReactNode;
+  children: ReactNode;
   className?: string;
+  /** narrow: 56rem, default: 80rem */
+  size?: 'default' | 'narrow';
 }
 
-export const Container: React.FC<ContainerProps> = ({ children, className = '' }) => {
-  return (
-    <div className={`max-w-7xl w-full mx-auto lg:max-w-[85rem] xl:max-w-[78rem] sm:px-6 lg:px-8 ${className}`}>
-      {children}
-    </div>
-  );
-};
+export const Container = ({ children, className = '', size = 'default' }: ContainerProps) => (
+  <div className={`mx-auto w-full px-5 sm:px-8 lg:px-10 ${size === 'narrow' ? 'max-w-4xl' : 'max-w-7xl'} ${className}`}>
+    {children}
+  </div>
+);

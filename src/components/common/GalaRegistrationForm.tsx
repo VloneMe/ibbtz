@@ -14,7 +14,7 @@ import {
 } from '@/services/galaApi';
 
 const inputClass = (hasError: boolean) =>
-  `w-full bg-white/20 border-white/30 text-white placeholder:text-gray-300 focus:border-[#768f00] focus:bg-white/25 text-sm sm:text-base ${hasError ? 'border-red-500' : ''}`;
+  `field ${hasError ? 'border-red-500' : ''}`;
 
 const SUGGESTED_AMOUNT: Record<(typeof REGISTRATION_TYPES)[number], (typeof AMOUNTS)[number]> = {
   'Individual': 'Tsh 250,000',
@@ -54,74 +54,74 @@ export default function GalaRegistrationForm({ className = '' }: { className?: s
 
   if (submittedId !== null) {
     return (
-      <div className={`bg-black/20 backdrop-blur-sm p-6 sm:p-8 rounded-lg border border-white/10 ${className}`}>
+      <div className={`bg-white p-6 sm:p-8 rounded-sm border border-stone ${className}`}>
         <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="text-center py-8 sm:py-12">
           <div className="flex justify-center mb-6">
-            <div className="w-20 h-20 bg-green-500/20 rounded-full flex items-center justify-center border-2 border-green-500/30">
-              <CheckCircle className="h-12 w-12 text-green-400" />
+            <div className="w-20 h-20 bg-green-50 rounded-full flex items-center justify-center border-2 border-green-200">
+              <CheckCircle className="h-12 w-12 text-green-600" />
             </div>
           </div>
-          <h3 className="text-2xl sm:text-3xl font-bold text-white mb-4">Registration Received</h3>
-          <p className="text-lg text-gray-300 mb-6 max-w-2xl mx-auto leading-relaxed">
+          <h3 className="font-display text-2xl sm:text-3xl font-semibold text-ink mb-4">Registration Received</h3>
+          <p className="text-lg text-ink-muted mb-6 max-w-2xl mx-auto leading-relaxed">
             Thank you for registering for the Impact Business Awards Gala. Our team will be in touch with payment and event details.
           </p>
-          <p className="text-sm text-green-300">Reference: IBB-GALA-{String(submittedId).padStart(4, '0')}</p>
+          <p className="text-sm text-green-700">Reference: IBB-GALA-{String(submittedId).padStart(4, '0')}</p>
         </motion.div>
       </div>
     );
   }
 
   return (
-    <div className={`bg-black/20 backdrop-blur-sm p-6 sm:p-8 rounded-lg border border-white/10 ${className}`}>
+    <div className={`bg-white p-6 sm:p-8 rounded-sm border border-stone ${className}`}>
       <div className="mb-6">
         <div className="flex items-center gap-3 mb-3">
-          <div className="w-12 h-12 bg-[#768f00] rounded-full flex items-center justify-center">
+          <div className="w-12 h-12 bg-navy rounded-full flex items-center justify-center">
             <Ticket className="h-6 w-6 text-white" />
           </div>
-          <h3 className="text-2xl sm:text-3xl font-bold text-white">Registration Form</h3>
+          <h3 className="font-display text-2xl sm:text-3xl font-semibold text-ink">Registration Form</h3>
         </div>
-        <p className="text-gray-300 text-sm sm:text-base">Fields marked * are required.</p>
+        <p className="text-ink-muted text-sm sm:text-base">Fields marked * are required.</p>
       </div>
 
       {error && (
-        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="mb-6 p-4 bg-red-500/20 border border-red-500/30 rounded-lg flex items-start gap-3">
-          <AlertCircle className="h-5 w-5 text-red-400 flex-shrink-0 mt-0.5" />
-          <p className="text-red-400">{error}</p>
+        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg flex items-start gap-3">
+          <AlertCircle className="h-5 w-5 text-red-600 flex-shrink-0 mt-0.5" />
+          <p className="text-red-600">{error}</p>
         </motion.div>
       )}
 
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-6" noValidate>
         {/* Attendee Information */}
         <fieldset className="space-y-4">
-          <legend className="text-[#768f00] font-bold uppercase tracking-wider text-sm mb-2">Attendee Information</legend>
+          <legend className="text-gold font-semibold uppercase tracking-[0.18em] text-xs mb-2">Attendee Information</legend>
 
           <div>
-            <Label htmlFor="gala-fullName" className="text-white font-semibold mb-2 block">Full Name *</Label>
+            <Label htmlFor="gala-fullName" className="field-label">Full Name *</Label>
             <Input id="gala-fullName" {...register('fullName')} className={inputClass(!!errors.fullName)} placeholder="Jane Doe" autoComplete="name" />
-            {errors.fullName && <p className="text-red-400 text-sm mt-1">{errors.fullName.message}</p>}
+            {errors.fullName && <p className="text-red-600 text-sm mt-1">{errors.fullName.message}</p>}
           </div>
 
           <div className="grid sm:grid-cols-2 gap-4">
             <div>
-              <Label htmlFor="gala-email" className="text-white font-semibold mb-2 block">Email Address *</Label>
+              <Label htmlFor="gala-email" className="field-label">Email Address *</Label>
               <Input id="gala-email" type="email" {...register('email')} className={inputClass(!!errors.email)} placeholder="jane@company.com" autoComplete="email" />
-              {errors.email && <p className="text-red-400 text-sm mt-1">{errors.email.message}</p>}
+              {errors.email && <p className="text-red-600 text-sm mt-1">{errors.email.message}</p>}
             </div>
             <div>
-              <Label htmlFor="gala-phone" className="text-white font-semibold mb-2 block">Phone Number *</Label>
+              <Label htmlFor="gala-phone" className="field-label">Phone Number *</Label>
               <Input id="gala-phone" type="tel" {...register('phone')} className={inputClass(!!errors.phone)} placeholder="+255 7xx xxx xxx" autoComplete="tel" />
-              {errors.phone && <p className="text-red-400 text-sm mt-1">{errors.phone.message}</p>}
+              {errors.phone && <p className="text-red-600 text-sm mt-1">{errors.phone.message}</p>}
             </div>
           </div>
 
           <div className="grid sm:grid-cols-2 gap-4">
             <div>
-              <Label htmlFor="gala-organisation" className="text-white font-semibold mb-2 block">Organisation / Company *</Label>
+              <Label htmlFor="gala-organisation" className="field-label">Organisation / Company *</Label>
               <Input id="gala-organisation" {...register('organisation')} className={inputClass(!!errors.organisation)} placeholder="Company name" autoComplete="organization" />
-              {errors.organisation && <p className="text-red-400 text-sm mt-1">{errors.organisation.message}</p>}
+              {errors.organisation && <p className="text-red-600 text-sm mt-1">{errors.organisation.message}</p>}
             </div>
             <div>
-              <Label htmlFor="gala-jobTitle" className="text-white font-semibold mb-2 block">Job Title / Position</Label>
+              <Label htmlFor="gala-jobTitle" className="field-label">Job Title / Position</Label>
               <Input id="gala-jobTitle" {...register('jobTitle')} className={inputClass(!!errors.jobTitle)} placeholder="e.g. Managing Director" autoComplete="organization-title" />
             </div>
           </div>
@@ -129,7 +129,7 @@ export default function GalaRegistrationForm({ className = '' }: { className?: s
 
         {/* Registration Type */}
         <fieldset>
-          <legend className="text-[#768f00] font-bold uppercase tracking-wider text-sm mb-3">Registration Type *</legend>
+          <legend className="text-gold font-semibold uppercase tracking-[0.18em] text-xs mb-3">Registration Type *</legend>
           <Controller
             name="registrationType"
             control={control}
@@ -149,15 +149,15 @@ export default function GalaRegistrationForm({ className = '' }: { className?: s
                         if (!getValues('amount')) setValue('amount', SUGGESTED_AMOUNT[type]);
                       }}
                       className={`flex items-center gap-4 p-4 rounded-lg border-2 text-left transition-colors ${
-                        selected ? 'border-[#768f00] bg-[#768f00]/20' : 'border-white/20 bg-white/10 hover:border-white/40'
+                        selected ? 'border-navy bg-navy/5' : 'border-stone bg-white hover:border-navy/50'
                       } ${errors.registrationType ? 'border-red-500' : ''}`}
                     >
-                      <div className={`w-10 h-10 rounded-full flex items-center justify-center ${selected ? 'bg-[#768f00]' : 'bg-white/10'}`}>
+                      <div className={`w-10 h-10 rounded-full flex items-center justify-center ${selected ? 'bg-navy' : 'bg-sand'}`}>
                         <Icon className="h-5 w-5 text-white" />
                       </div>
                       <div>
-                        <div className="font-semibold text-white">{type}</div>
-                        <div className="text-sm text-gray-300">{SUGGESTED_AMOUNT[type]}</div>
+                        <div className="font-semibold text-ink">{type}</div>
+                        <div className="text-sm text-ink-muted">{SUGGESTED_AMOUNT[type]}</div>
                       </div>
                     </button>
                   );
@@ -165,15 +165,15 @@ export default function GalaRegistrationForm({ className = '' }: { className?: s
               </div>
             )}
           />
-          {errors.registrationType && <p className="text-red-400 text-sm mt-1">{errors.registrationType.message}</p>}
+          {errors.registrationType && <p className="text-red-600 text-sm mt-1">{errors.registrationType.message}</p>}
         </fieldset>
 
         {/* Payment Details */}
         <fieldset className="space-y-4">
-          <legend className="text-[#768f00] font-bold uppercase tracking-wider text-sm mb-2">Payment Details</legend>
+          <legend className="text-gold font-semibold uppercase tracking-[0.18em] text-xs mb-2">Payment Details</legend>
           <div className="grid sm:grid-cols-2 gap-4">
             <div>
-              <Label htmlFor="gala-paymentMethod" className="text-white font-semibold mb-2 block">Payment Method</Label>
+              <Label htmlFor="gala-paymentMethod" className="field-label">Payment Method</Label>
               <Controller
                 name="paymentMethod"
                 control={control}
@@ -182,9 +182,9 @@ export default function GalaRegistrationForm({ className = '' }: { className?: s
                     <SelectTrigger id="gala-paymentMethod" className={inputClass(!!errors.paymentMethod)}>
                       <SelectValue placeholder="Select payment method" />
                     </SelectTrigger>
-                    <SelectContent className="bg-gray-800 border-gray-700 text-white">
+                    <SelectContent className="bg-white border-stone text-ink">
                       {PAYMENT_METHODS.map((m) => (
-                        <SelectItem key={m} value={m} className="hover:bg-gray-700 focus:bg-gray-700">{m}</SelectItem>
+                        <SelectItem key={m} value={m} className="focus:bg-sand">{m}</SelectItem>
                       ))}
                     </SelectContent>
                   </Select>
@@ -192,7 +192,7 @@ export default function GalaRegistrationForm({ className = '' }: { className?: s
               />
             </div>
             <div>
-              <Label htmlFor="gala-amount" className="text-white font-semibold mb-2 block">Amount</Label>
+              <Label htmlFor="gala-amount" className="field-label">Amount</Label>
               <Controller
                 name="amount"
                 control={control}
@@ -201,9 +201,9 @@ export default function GalaRegistrationForm({ className = '' }: { className?: s
                     <SelectTrigger id="gala-amount" className={inputClass(!!errors.amount)}>
                       <SelectValue placeholder="Select amount" />
                     </SelectTrigger>
-                    <SelectContent className="bg-gray-800 border-gray-700 text-white">
+                    <SelectContent className="bg-white border-stone text-ink">
                       {AMOUNTS.map((a) => (
-                        <SelectItem key={a} value={a} className="hover:bg-gray-700 focus:bg-gray-700">{a}</SelectItem>
+                        <SelectItem key={a} value={a} className="focus:bg-sand">{a}</SelectItem>
                       ))}
                     </SelectContent>
                   </Select>
@@ -213,7 +213,7 @@ export default function GalaRegistrationForm({ className = '' }: { className?: s
           </div>
         </fieldset>
 
-        <Button type="submit" disabled={isSubmitting} className="w-full bg-[#768f00] hover:bg-[#768f00]/90 text-white py-4 text-base sm:text-lg font-semibold disabled:opacity-50 shadow-lg">
+        <Button type="submit" disabled={isSubmitting} className="w-full bg-navy hover:bg-navy-soft text-white py-4 text-base sm:text-lg font-semibold disabled:opacity-50 shadow-lg">
           {isSubmitting ? (<><Loader2 className="h-5 w-5 mr-2 animate-spin" />Submitting...</>) : (<><Send className="h-5 w-5 mr-2" />Submit Registration</>)}
         </Button>
       </form>

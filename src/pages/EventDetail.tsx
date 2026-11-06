@@ -297,7 +297,7 @@ export default function EventDetail() {
                 )}
 
                 <div className="space-y-4">
-                  <Button className="w-full bg-[#768f00] hover:bg-[#768f00]/90 text-white py-4 text-lg rounded-full">
+                  <Button className="w-full bg-navy hover:bg-navy-soft text-white py-4 text-lg rounded-full">
                     REGISTER NOW
                     <ArrowRight className="ml-2 h-5 w-5" />
                   </Button>

@@ -1,6 +1,5 @@
-import React, { createContext, useContext, useState, useEffect } from 'react';
+import React, { createContext, useContext, useState } from 'react';
 import type { ReactNode } from 'react';
-import { useLocation } from 'react-router-dom';
 
 interface PageLoadingContextType {
   isLoading: boolean;
@@ -26,19 +25,6 @@ interface PageLoadingProviderProps {
 export const PageLoadingProvider: React.FC<PageLoadingProviderProps> = ({ children }) => {
   const [isLoading, setIsLoading] = useState(false);
   const [loadingMessage, setLoadingMessage] = useState('Loading...');
-  const location = useLocation();
-
-  // Simple auto-loading on route changes
-  useEffect(() => {
-    setIsLoading(true);
-    setLoadingMessage('Loading page...');
-    
-    const timer = setTimeout(() => {
-      setIsLoading(false);
-    }, 600); // Shorter loading time
-
-    return () => clearTimeout(timer);
-  }, [location.pathname]);
 
   const setLoading = (loading: boolean) => {
     setIsLoading(loading);

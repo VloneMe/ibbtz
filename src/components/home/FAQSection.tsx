@@ -1,87 +1,40 @@
-import { motion } from 'framer-motion';
-import { Container } from '../../common/Container';
+import { Link } from 'react-router-dom';
+import { ArrowRight } from 'lucide-react';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
+import { Container } from '../../common/Container';
+import Reveal from '@/components/common/Reveal';
 
-// Animation variants
-const staggerContainer = {
-  hidden: { opacity: 0 },
-  visible: {
-    opacity: 1,
-    transition: {
-      staggerChildren: 0.1,
-      when: "beforeChildren"
-    }
-  }
-};
+const faqs = [
+  { q: 'What is the Impact Business Breakfast?', a: "A networking and knowledge-sharing platform that brings together industry leaders, entrepreneurs, government officials and professionals to discuss the issues affecting Tanzania's economic development." },
+  { q: 'How do I register?', a: 'Registration for the Impact Business Awards Gala is open on this site. For the breakfast editions, use the contact page and our team will reach you with the next date and registration details.' },
+  { q: 'What does attendance cost?', a: 'Breakfast editions: individual seats are TZS 120,000 and corporate tables TZS 1,500,000. The Awards Gala: individual Tsh 250,000 and corporate table Tsh 2,000,000.' },
+  { q: 'Who can attend?', a: "Business leaders, government officials, entrepreneurs, academics and professionals with an interest in Tanzania's economic development and human capital growth." },
+  { q: 'Is there time for networking?', a: 'Yes. Every edition includes dedicated networking time, breaks and interactive discussion designed for meaningful introductions.' },
+];
 
-const fadeInUp = {
-  hidden: { y: 40, opacity: 0 },
-  visible: {
-    y: 0,
-    opacity: 1,
-    transition: { 
-      type: "spring" as const,
-      stiffness: 100,
-      damping: 10,
-      duration: 0.8
-    }
-  }
-};
-
-const FAQSection = () => {
-  const faqs = [
-    {
-      question: "What is the Impact Business Breakfast?",
-      answer: "The Impact Business Breakfast is a premier networking and knowledge-sharing platform that brings together industry leaders, entrepreneurs, and professionals to discuss critical issues affecting Tanzania's economic development."
-    },
-    {
-      question: "How do I register for the event?",
-      answer: "You can register by clicking the 'REGISTER NOW' button on this page or visiting our registration portal. Payment is required upon registration."
-    },
-    {
-      question: "What is the cost of attendance?",
-      answer: "Individual tickets cost TZS 120,000 and corporate tables cost TZS 1,500,000. This premium pricing reflects the high-value networking opportunities and expert insights provided at our events."
-    },
-    {
-      question: "Who can attend this event?",
-      answer: "The event is open to business leaders, government officials, entrepreneurs, academics, and professionals interested in Tanzania's economic development and human capital growth."
-    },
-    {
-      question: "Will there be networking opportunities?",
-      answer: "Yes, the event includes dedicated networking sessions, coffee breaks, and interactive discussions to facilitate meaningful connections among attendees."
-    }
-  ];
-
-  return (
-    <motion.div 
-      initial="hidden"
-      whileInView="visible"
-      viewport={{ once: true, margin: "-100px" }}
-      variants={staggerContainer}
-      className="py-20 bg-black"
-    >
-      <Container className="min-w-full px-4">
-        <motion.div variants={fadeInUp} className="text-center mb-16">
-          <h2 className="text-4xl md:text-5xl font-bold text-white">Frequently Asked Questions</h2>
-        </motion.div>
-        
-        <div className="max-w-4xl mx-auto">
-          <Accordion type="single" collapsible defaultValue="item-0" className="space-y-4">
-            {faqs.map((faq, index) => (
-              <AccordionItem key={index} value={`item-${index}`} className="bg-gray-900 border border-[oklch(0.473_0.137_46.201)]/20 rounded-lg">
-                <AccordionTrigger className="text-white hover:text-[#768f00] px-6 py-4">
-                  {faq.question}
-                </AccordionTrigger>
-                <AccordionContent className="text-gray-300 px-6 pb-4">
-                  {faq.answer}
-                </AccordionContent>
+const FAQSection = () => (
+  <section className="section bg-ivory" aria-labelledby="faq-title">
+    <Container>
+      <div className="grid gap-10 lg:grid-cols-12 lg:gap-16">
+        <Reveal className="lg:col-span-4">
+          <p className="eyebrow">Questions</p>
+          <h2 id="faq-title" className="mt-5 font-display text-3xl font-semibold leading-tight text-navy sm:text-4xl">Frequently asked</h2>
+          <p className="mt-4 leading-relaxed text-ink-muted">Can't find what you need? Our team is happy to help.</p>
+          <Link to="/contactus" className="btn-link mt-5">Contact us <ArrowRight className="h-4 w-4" /></Link>
+        </Reveal>
+        <Reveal delay={0.1} className="lg:col-span-8">
+          <Accordion type="single" collapsible defaultValue="item-0" className="border-t border-stone">
+            {faqs.map((f, i) => (
+              <AccordionItem key={f.q} value={`item-${i}`} className="border-b border-stone">
+                <AccordionTrigger className="py-5 text-left text-base font-semibold text-ink hover:text-navy hover:no-underline sm:text-lg">{f.q}</AccordionTrigger>
+                <AccordionContent className="pb-6 text-base leading-relaxed text-ink-muted">{f.a}</AccordionContent>
               </AccordionItem>
             ))}
           </Accordion>
-        </div>
-      </Container>
-    </motion.div>
-  );
-};
+        </Reveal>
+      </div>
+    </Container>
+  </section>
+);
 
 export default FAQSection;

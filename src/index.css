@@ -1,9 +1,24 @@
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,500;0,600;0,700;1,500&family=Inter:wght@400;500;600;700&display=swap');
 @import "tailwindcss";
 @import "tw-animate-css";
 
 @custom-variant dark (&:is(.dark *));
 
 @theme inline {
+  --font-display: "Playfair Display", Georgia, "Times New Roman", serif;
+  --font-sans: "Inter", ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  --color-navy: #012557;
+  --color-navy-deep: #011839;
+  --color-navy-soft: #1d3f7a;
+  --color-ink: #141a26;
+  --color-ivory: #f8f6f1;
+  --color-sand: #efebe2;
+  --color-stone: #d9d3c6;
+  --color-gold: #c9a227;
+  --color-gold-soft: #e7cf7a;
+  --color-brand-green: #768f00;
+  --color-brand-orange: #f08a3c;
+  --color-ink-muted: #5b6472;
   --radius-sm: calc(var(--radius) - 4px);
   --radius-md: calc(var(--radius) - 2px);
   --radius-lg: var(--radius);
@@ -42,15 +57,15 @@
 }
 
 :root {
-  --radius: 0.625rem;
-  --background: oklch(1 0 0);
-  --foreground: oklch(0.145 0 0);
+  --radius: 0.25rem;
+  --background: #f8f6f1;
+  --foreground: #141a26;
   --card: oklch(1 0 0);
   --card-foreground: oklch(0.145 0 0);
   --popover: oklch(1 0 0);
   --popover-foreground: oklch(0.145 0 0);
-  --primary: oklch(0.205 0 0);
-  --primary-foreground: oklch(0.985 0 0);
+  --primary: #012557;
+  --primary-foreground: #ffffff;
   --secondary: oklch(0.97 0 0);
   --secondary-foreground: oklch(0.205 0 0);
   --muted: oklch(0.97 0 0);
@@ -60,7 +75,7 @@
   --destructive: oklch(0.577 0.245 27.325);
   --border: oklch(0.922 0 0);
   --input: oklch(0.922 0 0);
-  --ring: oklch(0.708 0 0);
+  --ring: #012557;
   --chart-1: oklch(0.646 0.222 41.116);
   --chart-2: oklch(0.6 0.118 184.704);
   --chart-3: oklch(0.398 0.07 227.392);
@@ -114,7 +129,63 @@
   * {
     @apply border-border outline-ring/50;
   }
+  html {
+    scroll-behavior: smooth;
+    -webkit-text-size-adjust: 100%;
+  }
   body {
-    @apply bg-background text-foreground;
+    @apply bg-ivory text-ink font-sans antialiased;
+    font-feature-settings: "kern", "liga", "cv11";
+  }
+  h1, h2, h3 {
+    font-family: var(--font-display);
+    letter-spacing: -0.01em;
+  }
+  ::selection {
+    background: #c9a227;
+    color: #011839;
+  }
+}
+
+@layer components {
+  .eyebrow {
+    @apply inline-flex items-center gap-3 text-[0.72rem] font-semibold uppercase tracking-[0.18em] text-gold;
+  }
+  .eyebrow::before {
+    content: "";
+    @apply block h-px w-8 bg-gold;
+  }
+  .section {
+    @apply py-16 sm:py-20 lg:py-28;
+  }
+  .prose-lead {
+    @apply text-lg leading-relaxed text-ink-muted sm:text-xl;
+  }
+  .btn {
+    @apply inline-flex items-center justify-center gap-2 rounded-sm px-6 py-3 text-sm font-semibold tracking-wide transition-colors duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50;
+  }
+  .btn-primary {
+    @apply inline-flex items-center justify-center gap-2 rounded-sm px-6 py-3 text-sm font-semibold tracking-wide transition-colors duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 bg-navy text-white hover:bg-navy-soft;
+  }
+  .btn-gold {
+    @apply inline-flex items-center justify-center gap-2 rounded-sm px-6 py-3 text-sm font-semibold tracking-wide transition-colors duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 bg-gold text-navy-deep hover:bg-gold-soft;
+  }
+  .btn-outline {
+    @apply inline-flex items-center justify-center gap-2 rounded-sm px-6 py-3 text-sm font-semibold tracking-wide transition-colors duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 border border-navy/30 text-navy hover:border-navy hover:bg-navy hover:text-white;
+  }
+  .btn-outline-light {
+    @apply inline-flex items-center justify-center gap-2 rounded-sm px-6 py-3 text-sm font-semibold tracking-wide transition-colors duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 border border-white/40 text-white hover:border-white hover:bg-white hover:text-navy;
+  }
+  .btn-link {
+    @apply inline-flex items-center gap-2 text-sm font-semibold text-navy underline-offset-4 hover:underline;
+  }
+  .field {
+    @apply w-full rounded-sm border border-stone bg-white px-3.5 py-2.5 text-base text-ink placeholder:text-ink-muted/70 focus:border-navy focus:outline-none focus:ring-2 focus:ring-navy/15 aria-invalid:border-red-500;
+  }
+  .field-label {
+    @apply mb-1.5 block text-sm font-semibold text-ink;
+  }
+  .field-error {
+    @apply mt-1 text-sm text-red-600;
   }
 }

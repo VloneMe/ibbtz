@@ -1,7 +1,7 @@
-import ibb14 from "/src/assets/ibb1.jpg";
-import ibb2 from "/src/assets/ibb2.jpg";
-import ibb3 from "/src/assets/ibb3.jpg";
-import ibb4 from "/src/assets/ibb4.jpg";
+import ibb14 from "/src/assets/photos/audience.jpg";
+import ibb2 from "/src/assets/photos/networking-1.jpg";
+import ibb3 from "/src/assets/photos/presentation.jpg";
+import ibb4 from "/src/assets/photos/networking-2.jpg";
 
 export interface NextEventData {
   id: string;

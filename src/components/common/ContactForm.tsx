@@ -125,11 +125,11 @@ export default function ContactForm({
 
 
   return (
-    <div className={`bg-black/20 p-6 sm:p-8 rounded-lg ${className}`}>
+    <div className={`bg-white p-6 sm:p-8 rounded-sm border border-stone ${className}`}>
       <div className="mb-6">
-        <h3 className="text-2xl font-bold text-white mb-2">{title}</h3>
+        <h3 className="font-display text-2xl font-semibold text-ink mb-2">{title}</h3>
         {description && (
-          <p className="text-gray-300">{description}</p>
+          <p className="text-ink-muted">{description}</p>
         )}
       </div>
       
@@ -140,11 +140,11 @@ export default function ContactForm({
           animate={{ opacity: 1, y: 0 }}
           className="mb-6 p-4 bg-green-500/20 border border-green-500/30 rounded-lg flex items-center gap-3"
         >
-          <CheckCircle className="h-5 w-5 text-green-400" />
-          <div className="text-green-400">
+          <CheckCircle className="h-5 w-5 text-green-600" />
+          <div className="text-green-600">
             <p>{formState.successMessage}</p>
             {formState.submissionId && (
-              <p className="text-xs text-green-300 mt-1">
+              <p className="text-xs text-green-700 mt-1">
                 Reference ID: {formState.submissionId}
               </p>
             )}
@@ -157,10 +157,10 @@ export default function ContactForm({
         <motion.div 
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          className="mb-6 p-4 bg-red-500/20 border border-red-500/30 rounded-lg flex items-center gap-3"
+          className="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg flex items-center gap-3"
         >
-          <AlertCircle className="h-5 w-5 text-red-400" />
-          <p className="text-red-400">{formState.error}</p>
+          <AlertCircle className="h-5 w-5 text-red-600" />
+          <p className="text-red-600">{formState.error}</p>
         </motion.div>
       )}
       
@@ -169,155 +169,155 @@ export default function ContactForm({
         <input type="hidden" {...register('sentFrom')} value="ibb - website" />
         <div className="grid sm:grid-cols-2 gap-4">
           <div>
-            <Label htmlFor="contact-fname" className="text-white font-semibold mb-2 block text-sm sm:text-base">
+            <Label htmlFor="contact-fname" className="field-label">
               First Name *
             </Label>
             <Input 
               id="contact-fname"
               type="text" 
               {...register('fname')}
-              className={`w-full bg-white/20 border-white/30 text-white placeholder:text-gray-300 focus:border-[#768f00] focus:bg-white/25 text-sm sm:text-base ${
+              className={`field ${
                 errors.fname ? 'border-red-500' : ''
               }`}
               placeholder="Your first name"
             />
             {errors.fname && (
-              <p className="text-red-400 text-xs sm:text-sm mt-1">{errors.fname.message}</p>
+              <p className="text-red-600 text-xs sm:text-sm mt-1">{errors.fname.message}</p>
             )}
           </div>
           <div>
-            <Label htmlFor="contact-lname" className="text-white font-semibold mb-2 block text-sm sm:text-base">
+            <Label htmlFor="contact-lname" className="field-label">
               Last Name *
             </Label>
             <Input 
               id="contact-lname"
               type="text" 
               {...register('lname')}
-              className={`w-full bg-white/20 border-white/30 text-white placeholder:text-gray-300 focus:border-[#768f00] focus:bg-white/25 text-sm sm:text-base ${
+              className={`field ${
                 errors.lname ? 'border-red-500' : ''
               }`}
               placeholder="Your last name"
             />
             {errors.lname && (
-              <p className="text-red-400 text-xs sm:text-sm mt-1">{errors.lname.message}</p>
+              <p className="text-red-600 text-xs sm:text-sm mt-1">{errors.lname.message}</p>
             )}
           </div>
         </div>
         
         <div className="grid sm:grid-cols-2 gap-4">
           <div>
-            <Label htmlFor="contact-email" className="text-white font-semibold mb-2 block text-sm sm:text-base">
+            <Label htmlFor="contact-email" className="field-label">
               Email *
             </Label>
             <Input 
               id="contact-email"
               type="email" 
               {...register('email')}
-              className={`w-full bg-white/20 border-white/30 text-white placeholder:text-gray-300 focus:border-[#768f00] focus:bg-white/25 text-sm sm:text-base ${
+              className={`field ${
                 errors.email ? 'border-red-500' : ''
               }`}
               placeholder="your.email@example.com"
             />
             {errors.email && (
-              <p className="text-red-400 text-xs sm:text-sm mt-1">{errors.email.message}</p>
+              <p className="text-red-600 text-xs sm:text-sm mt-1">{errors.email.message}</p>
             )}
           </div>
           <div>
-            <Label htmlFor="contact-phone" className="text-white font-semibold mb-2 block text-sm sm:text-base">
+            <Label htmlFor="contact-phone" className="field-label">
               Phone *
             </Label>
             <Input 
               id="contact-phone"
               type="tel" 
               {...register('phone')}
-              className={`w-full bg-white/20 border-white/30 text-white placeholder:text-gray-300 focus:border-[#768f00] focus:bg-white/25 text-sm sm:text-base ${
+              className={`field ${
                 errors.phone ? 'border-red-500' : ''
               }`}
               placeholder="+1234567890"
             />
             {errors.phone && (
-              <p className="text-red-400 text-xs sm:text-sm mt-1">{errors.phone.message}</p>
+              <p className="text-red-600 text-xs sm:text-sm mt-1">{errors.phone.message}</p>
             )}
           </div>
         </div>
         
         <div className="grid sm:grid-cols-2 gap-4">
           <div>
-            <Label htmlFor="contact-company" className="text-white font-semibold mb-2 block text-sm sm:text-base">
+            <Label htmlFor="contact-company" className="field-label">
               Company *
             </Label>
             <Input 
               id="contact-company"
               type="text" 
               {...register('company')}
-              className={`w-full bg-white/20 border-white/30 text-white placeholder:text-gray-300 focus:border-[#768f00] focus:bg-white/25 text-sm sm:text-base ${
+              className={`field ${
                 errors.company ? 'border-red-500' : ''
               }`}
               placeholder="Your company name"
             />
             {errors.company && (
-              <p className="text-red-400 text-xs sm:text-sm mt-1">{errors.company.message}</p>
+              <p className="text-red-600 text-xs sm:text-sm mt-1">{errors.company.message}</p>
             )}
           </div>
           <div>
-            <Label htmlFor="contact-country" className="text-white font-semibold mb-2 block text-sm sm:text-base">
+            <Label htmlFor="contact-country" className="field-label">
               Country *
             </Label>
             <Input 
               id="contact-country"
               type="text" 
               {...register('country')}
-              className={`w-full bg-white/20 border-white/30 text-white placeholder:text-gray-300 focus:border-[#768f00] focus:bg-white/25 text-sm sm:text-base ${
+              className={`field ${
                 errors.country ? 'border-red-500' : ''
               }`}
               placeholder="Your country"
             />
             {errors.country && (
-              <p className="text-red-400 text-xs sm:text-sm mt-1">{errors.country.message}</p>
+              <p className="text-red-600 text-xs sm:text-sm mt-1">{errors.country.message}</p>
             )}
           </div>
         </div>
         
         <div>
-          <Label htmlFor="contact-subject" className="text-white font-semibold mb-2 block">
+          <Label htmlFor="contact-subject" className="field-label">
             Subject *
           </Label>
           <Input 
             id="contact-subject"
             type="text" 
             {...register('subject')}
-            className={`w-full bg-white/20 border-white/30 text-white placeholder:text-gray-300 focus:border-[#768f00] focus:bg-white/25 ${
+            className={`field ${
               errors.subject ? 'border-red-500' : ''
             }`}
             placeholder="What's this about?"
           />
           {errors.subject && (
-            <p className="text-red-400 text-sm mt-1">{errors.subject.message}</p>
+            <p className="text-red-600 text-sm mt-1">{errors.subject.message}</p>
           )}
         </div>
         
         <div>
-          <Label htmlFor="contact-message" className="text-white font-semibold mb-2 block">
+          <Label htmlFor="contact-message" className="field-label">
             Message *
           </Label>
           <Textarea 
             id="contact-message"
             {...register('message')}
             rows={6}
-            className={`w-full bg-white/20 border-white/30 text-white placeholder:text-gray-300 focus:border-[#768f00] focus:bg-white/25 resize-none ${
+            className={`field resize-none ${
               errors.message ? 'border-red-500' : ''
             }`}
             placeholder="Tell us more about your inquiry..."
           />
           {errors.message && (
-            <p className="text-red-400 text-sm mt-1">{errors.message.message}</p>
+            <p className="text-red-600 text-sm mt-1">{errors.message.message}</p>
           )}
         </div>
         
         <Button 
           type="submit" 
           disabled={formState.isSubmitting}
-          className="w-full bg-[#768f00] hover:bg-[#768f00]/80 text-white py-4 text-lg font-semibold disabled:opacity-50"
+          className="w-full bg-navy hover:bg-navy-soft text-white py-4 text-lg font-semibold disabled:opacity-50"
         >
           {formState.isSubmitting ? (
             <>

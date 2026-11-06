@@ -1,55 +1,54 @@
 import { useEffect } from 'react';
-import { motion } from 'framer-motion';
 import { Container } from '../common/Container';
-import { Badge } from '@/components/ui/badge';
-import { Award, Users, CreditCard } from 'lucide-react';
+import Reveal from '@/components/common/Reveal';
 import GalaRegistrationForm from '@/components/common/GalaRegistrationForm';
+import hero from '@/assets/photos/hero.jpg';
 
-const fadeInUp = {
-  hidden: { y: 40, opacity: 0 },
-  visible: { y: 0, opacity: 1, transition: { type: 'spring' as const, stiffness: 100, damping: 15 } },
-};
+const tiers = [
+  { title: 'Individual', price: 'Tsh 250,000', text: 'One seat at the gala dinner and awards ceremony.' },
+  { title: 'Corporate table', price: 'Tsh 2,000,000', text: 'A full table for your organisation, with recognition on the night.' },
+];
 
 export default function GalaRegistration() {
-  useEffect(() => {
-    document.title = 'Impact Business Awards Gala | Registration | IBB+ Tanzania';
-  }, []);
-
+  useEffect(() => { document.title = 'Register | Impact Business Awards Gala | IBB+ Tanzania'; }, []);
   return (
-    <main className="min-h-screen bg-gradient-to-br from-gray-900 via-black to-gray-800 text-white font-poppins relative overflow-hidden">
-      <Container className="relative z-10 py-16 sm:py-24 px-4">
-        <motion.div initial="hidden" animate="visible" variants={fadeInUp} className="text-center max-w-3xl mx-auto mb-12">
-          <Badge className="bg-[#768f00] text-white px-4 py-2 font-bold text-sm mb-4">Impact Business Awards</Badge>
-          <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold mb-4">Impact Business Awards Gala</h1>
-          <p className="text-lg text-gray-300 leading-relaxed">
-            Reserve your seat at the gala celebrating Tanzania's impact-driven businesses and leaders. Complete the form below to register as an individual or book a corporate table.
-          </p>
-        </motion.div>
+    <>
+      <section className="relative isolate overflow-hidden bg-navy-deep text-white">
+        <img src={hero} alt="" aria-hidden="true" className="absolute inset-0 h-full w-full object-cover opacity-30" />
+        <div className="absolute inset-0 bg-gradient-to-b from-navy-deep/70 via-navy-deep/85 to-navy-deep" />
+        <Container className="relative py-16 sm:py-24">
+          <p className="eyebrow text-gold-soft">Impact Business Awards</p>
+          <h1 className="mt-5 max-w-3xl font-display text-4xl font-semibold leading-[1.1] sm:text-5xl">Impact Business Awards Gala</h1>
+          <p className="mt-5 max-w-2xl text-lg leading-relaxed text-white/80 sm:text-xl">Reserve your seat at the evening celebrating Tanzania's impact-driven businesses and leaders. Register as an individual or book a corporate table.</p>
+        </Container>
+      </section>
 
-        <div className="grid lg:grid-cols-3 gap-8 items-start">
-          <motion.aside initial="hidden" animate="visible" variants={fadeInUp} className="space-y-4 lg:order-2">
-            {[
-              { icon: Users, title: 'Individual', text: 'One seat at the gala. Tsh 250,000.' },
-              { icon: Award, title: 'Corporate Table', text: 'A full table for your organisation. Tsh 2,000,000.' },
-              { icon: CreditCard, title: 'Payment', text: 'Pay by bank transfer or mobile money. Details are shared after registration.' },
-            ].map(({ icon: Icon, title, text }) => (
-              <div key={title} className="bg-black/20 backdrop-blur-sm p-5 rounded-lg border border-white/10 flex gap-4">
-                <div className="w-10 h-10 bg-[#768f00] rounded-full flex items-center justify-center flex-shrink-0">
-                  <Icon className="h-5 w-5 text-white" />
-                </div>
-                <div>
-                  <h3 className="font-semibold text-white">{title}</h3>
-                  <p className="text-sm text-gray-300">{text}</p>
-                </div>
-              </div>
-            ))}
-          </motion.aside>
-
-          <motion.div initial="hidden" animate="visible" variants={fadeInUp} className="lg:col-span-2 lg:order-1">
-            <GalaRegistrationForm />
-          </motion.div>
-        </div>
-      </Container>
-    </main>
+      <section className="section bg-ivory">
+        <Container>
+          <div className="grid gap-10 lg:grid-cols-12 lg:gap-16">
+            <Reveal className="lg:col-span-8">
+              <GalaRegistrationForm />
+            </Reveal>
+            <Reveal delay={0.1} className="lg:col-span-4">
+              <h2 className="text-xs font-semibold uppercase tracking-[0.18em] text-ink">Registration options</h2>
+              <dl className="mt-5 divide-y divide-stone border-y border-stone">
+                {tiers.map((t) => (
+                  <div key={t.title} className="py-5">
+                    <div className="flex items-baseline justify-between gap-4">
+                      <dt className="font-semibold text-ink">{t.title}</dt>
+                      <dd className="font-display text-xl font-semibold text-navy">{t.price}</dd>
+                    </div>
+                    <p className="mt-1 text-sm leading-relaxed text-ink-muted">{t.text}</p>
+                  </div>
+                ))}
+              </dl>
+              <h2 className="mt-10 text-xs font-semibold uppercase tracking-[0.18em] text-ink">Payment</h2>
+              <p className="mt-3 text-sm leading-relaxed text-ink-muted">Pay by bank transfer or mobile money. Our team confirms your registration and shares payment details by email.</p>
+              <p className="mt-6 text-sm leading-relaxed text-ink-muted">Questions? <a href="mailto:ibb@impactadvisory.co.tz" className="font-semibold text-navy">ibb@impactadvisory.co.tz</a></p>
+            </Reveal>
+          </div>
+        </Container>
+      </section>
+    </>
   );
 }

@@ -128,7 +128,7 @@ export default function FeedbackForm({
   };
 
   return (
-    <div className={`bg-black/20 backdrop-blur-sm p-6 sm:p-8 rounded-lg border border-white/10 ${className}`}>
+    <div className={`bg-white p-6 sm:p-8 rounded-sm border border-stone ${className}`}>
       {/* Success Message - Replace entire form */}
       {formState.isSubmitted && formState.successMessage ? (
         <motion.div 
@@ -137,18 +137,18 @@ export default function FeedbackForm({
           className="text-center py-8 sm:py-12"
         >
           <div className="flex justify-center mb-6">
-            <div className="w-20 h-20 bg-green-500/20 rounded-full flex items-center justify-center border-2 border-green-500/30">
-              <CheckCircle className="h-12 w-12 text-green-400" />
+            <div className="w-20 h-20 bg-green-50 rounded-full flex items-center justify-center border-2 border-green-200">
+              <CheckCircle className="h-12 w-12 text-green-600" />
             </div>
           </div>
-          <h3 className="text-2xl sm:text-3xl font-bold text-white mb-4">
+          <h3 className="font-display text-2xl sm:text-3xl font-semibold text-ink mb-4">
             Thank You!
           </h3>
-          <p className="text-lg sm:text-xl text-gray-300 mb-6 max-w-2xl mx-auto leading-relaxed">
+          <p className="text-lg sm:text-xl text-ink-muted mb-6 max-w-2xl mx-auto leading-relaxed">
             {formState.successMessage}
           </p>
           {formState.submissionId && (
-            <p className="text-sm text-green-300">
+            <p className="text-sm text-green-700">
               Reference ID: {formState.submissionId}
             </p>
           )}
@@ -157,13 +157,13 @@ export default function FeedbackForm({
         <>
           <div className="mb-6">
             <div className="flex items-center gap-3 mb-3">
-              <div className="w-12 h-12 bg-[#768f00] rounded-full flex items-center justify-center">
+              <div className="w-12 h-12 bg-navy rounded-full flex items-center justify-center">
                 <MessageSquare className="h-6 w-6 text-white" />
               </div>
-              <h3 className="text-2xl sm:text-3xl font-bold text-white">{title}</h3>
+              <h3 className="font-display text-2xl sm:text-3xl font-semibold text-ink">{title}</h3>
             </div>
             {description && (
-              <p className="text-gray-300 text-sm sm:text-base leading-relaxed">{description}</p>
+              <p className="text-ink-muted text-sm sm:text-base leading-relaxed">{description}</p>
             )}
           </div>
           
@@ -172,55 +172,55 @@ export default function FeedbackForm({
             <motion.div 
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
-              className="mb-6 p-4 bg-red-500/20 border border-red-500/30 rounded-lg flex items-start gap-3"
+              className="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg flex items-start gap-3"
             >
-              <AlertCircle className="h-5 w-5 text-red-400 flex-shrink-0 mt-0.5" />
-              <p className="text-red-400">{formState.error}</p>
+              <AlertCircle className="h-5 w-5 text-red-600 flex-shrink-0 mt-0.5" />
+              <p className="text-red-600">{formState.error}</p>
             </motion.div>
           )}
           
           <form onSubmit={handleSubmit(onSubmitForm)} className="space-y-4 sm:space-y-6">
         {/* Name Field */}
         <div>
-          <Label htmlFor="feedback-name" className="text-white font-semibold mb-2 block text-sm sm:text-base">
+          <Label htmlFor="feedback-name" className="field-label">
             Full Name *
           </Label>
           <Input 
             id="feedback-name"
             type="text" 
             {...register('name')}
-            className={`w-full bg-white/20 border-white/30 text-white placeholder:text-gray-300 focus:border-[#768f00] focus:bg-white/25 text-sm sm:text-base ${
+            className={`field ${
               errors.name ? 'border-red-500' : ''
             }`}
             placeholder="John Doe"
           />
           {errors.name && (
-            <p className="text-red-400 text-xs sm:text-sm mt-1">{errors.name.message}</p>
+            <p className="text-red-600 text-xs sm:text-sm mt-1">{errors.name.message}</p>
           )}
         </div>
 
         {/* Email Field */}
         <div>
-          <Label htmlFor="feedback-email" className="text-white font-semibold mb-2 block text-sm sm:text-base">
+          <Label htmlFor="feedback-email" className="field-label">
             Email Address *
           </Label>
           <Input 
             id="feedback-email"
             type="email" 
             {...register('email')}
-            className={`w-full bg-white/20 border-white/30 text-white placeholder:text-gray-300 focus:border-[#768f00] focus:bg-white/25 text-sm sm:text-base ${
+            className={`field ${
               errors.email ? 'border-red-500' : ''
             }`}
             placeholder="john@example.com"
           />
           {errors.email && (
-            <p className="text-red-400 text-xs sm:text-sm mt-1">{errors.email.message}</p>
+            <p className="text-red-600 text-xs sm:text-sm mt-1">{errors.email.message}</p>
           )}
         </div>
 
         {/* Type Field */}
         <div>
-          <Label htmlFor="feedback-type" className="text-white font-semibold mb-2 block text-sm sm:text-base">
+          <Label htmlFor="feedback-type" className="field-label">
             Feedback Type *
           </Label>
           <Controller
@@ -230,20 +230,20 @@ export default function FeedbackForm({
               <Select onValueChange={field.onChange} value={field.value}>
                 <SelectTrigger 
                   id="feedback-type"
-                  className={`w-full bg-white/20 border-white/30 text-white focus:border-[#768f00] focus:bg-white/25 text-sm sm:text-base ${
+                  className={`field h-auto ${
                     errors.type ? 'border-red-500' : ''
                   }`}
                 >
                   <SelectValue placeholder="Select feedback type" />
                 </SelectTrigger>
-                <SelectContent className="bg-gray-800 border-gray-700 text-white">
-                  <SelectItem value="event" className="hover:bg-gray-700 focus:bg-gray-700">
+                <SelectContent className="bg-white border-stone text-ink">
+                  <SelectItem value="event" className="focus:bg-sand">
                     Event Feedback
                   </SelectItem>
-                  <SelectItem value="general" className="hover:bg-gray-700 focus:bg-gray-700">
+                  <SelectItem value="general" className="focus:bg-sand">
                     General Feedback
                   </SelectItem>
-                  <SelectItem value="service" className="hover:bg-gray-700 focus:bg-gray-700">
+                  <SelectItem value="service" className="focus:bg-sand">
                     Service Feedback
                   </SelectItem>
                 </SelectContent>
@@ -251,7 +251,7 @@ export default function FeedbackForm({
             )}
           />
           {errors.type && (
-            <p className="text-red-400 text-xs sm:text-sm mt-1">{errors.type.message}</p>
+            <p className="text-red-600 text-xs sm:text-sm mt-1">{errors.type.message}</p>
           )}
         </div>
 
@@ -260,27 +260,27 @@ export default function FeedbackForm({
         
         {/* Message Field */}
         <div>
-          <Label htmlFor="feedback-message" className="text-white font-semibold mb-2 block text-sm sm:text-base">
+          <Label htmlFor="feedback-message" className="field-label">
             Your Feedback *
           </Label>
           <Textarea 
             id="feedback-message"
             {...register('message')}
             rows={6}
-            className={`w-full bg-white/20 border-white/30 text-white placeholder:text-gray-300 focus:border-[#768f00] focus:bg-white/25 resize-none text-sm sm:text-base ${
+            className={`field resize-none ${
               errors.message ? 'border-red-500' : ''
             }`}
             placeholder="Please share your thoughts, suggestions, or feedback with us..."
           />
           {errors.message && (
-            <p className="text-red-400 text-xs sm:text-sm mt-1">{errors.message.message}</p>
+            <p className="text-red-600 text-xs sm:text-sm mt-1">{errors.message.message}</p>
           )}
         </div>
         
         <Button 
           type="submit" 
           disabled={formState.isSubmitting}
-          className="w-full bg-[#768f00] hover:bg-[#768f00]/90 text-white py-4 text-base sm:text-lg font-semibold disabled:opacity-50 transition-all duration-200 shadow-lg hover:shadow-xl"
+          className="btn-primary w-full py-3.5 text-base"
         >
           {formState.isSubmitting ? (
             <>

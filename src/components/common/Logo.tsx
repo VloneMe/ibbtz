@@ -8,39 +8,11 @@ interface LogoProps {
   size?: 'sm' | 'md' | 'lg' | 'xl';
 }
 
-export const Logo = ({ 
-  className = "", 
-  imgClasses = "", 
-  showLabel = false, 
-  labelText = "IBB+",
-  size = 'md'
-}: LogoProps) => {
-  const sizeClasses = {
-    sm: 'h-8 w-auto',
-    md: 'h-12 w-auto',
-    lg: 'h-16 w-auto',
-    xl: 'h-20 w-auto'
-  };
+const sizeClasses = { sm: 'h-8', md: 'h-10', lg: 'h-14', xl: 'h-20' };
 
-  const textSizeClasses = {
-    sm: 'text-sm',
-    md: 'text-lg',
-    lg: 'text-xl',
-    xl: 'text-2xl'
-  };
-
-  return (
-    <div className={`flex items-center gap-3 p-2 px-5 ${className}`}>
-      <img 
-        src={ibbLogo}
-        alt="IBB+ Logo - Ideals Beyond Ideas"
-        className={`object-contain ${sizeClasses[size]} ${imgClasses}`}
-      />
-      {showLabel && (
-        <span className={`font-extrabold tracking-widest text-white ${textSizeClasses[size]}`}>
-          {labelText}
-        </span>
-      )}
-    </div>
-  );
-};
+export const Logo = ({ className = '', imgClasses = '', showLabel = false, labelText = 'IBB+', size = 'md' }: LogoProps) => (
+  <span className={`inline-flex items-center gap-3 ${className}`}>
+    <img src={ibbLogo} alt="IBB+ Impact Business Breakfast" className={`w-auto object-contain ${sizeClasses[size]} ${imgClasses}`} />
+    {showLabel && <span className="font-display text-xl font-semibold text-navy">{labelText}</span>}
+  </span>
+);

@@ -103,9 +103,9 @@ export default function SponsorForm({
   };
 
   return (
-    <Card className="w-full max-w-2xl mx-auto bg-gray-50">
+    <Card className="w-full max-w-2xl mx-auto border-0 bg-white shadow-none">
       <CardHeader className="text-center">
-        <div className=" bg-[#768f00] rounded-full flex items-center justify-center mx-auto mb-4">
+        <div className="flex items-center justify-center mx-auto mb-4">
           <Logo size="lg" />
         </div>
         <CardTitle className="text-2xl font-bold text-gray-900">{title}</CardTitle>
@@ -127,7 +127,7 @@ export default function SponsorForm({
             {/* Company Information */}
             <div className="space-y-4">
               <h3 className="text-lg font-semibold text-gray-900 flex items-center gap-2">
-                <Building2 className="h-5 w-5 text-[#768f00]" />
+                <Building2 className="h-5 w-5 text-navy" />
                 Company Information
               </h3>
               
@@ -194,7 +194,7 @@ export default function SponsorForm({
             {/* Contact Information */}
             <div className="space-y-4">
               <h3 className="text-lg font-semibold text-gray-900 flex items-center gap-2">
-                <User className="h-5 w-5 text-[#768f00]" />
+                <User className="h-5 w-5 text-navy" />
                 Contact Information
               </h3>
               
@@ -261,7 +261,7 @@ export default function SponsorForm({
               <Button
                 type="submit"
                 disabled={isSubmitting}
-                className="flex-1 bg-[#768f00] hover:bg-[#768f00]/90 text-white"
+                className="flex-1 bg-navy hover:bg-navy-soft text-white"
               >
                 {isSubmitting ? (
                   <>

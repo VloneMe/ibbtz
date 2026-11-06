@@ -1,177 +1,37 @@
-import { motion } from 'framer-motion';
+import { useEffect } from 'react';
 import { Container } from '../common/Container';
-import { 
-  MessageSquare, 
-  Heart,
-  Star,
-  TrendingUp
-} from 'lucide-react';
 import FeedbackForm from '@/components/common/FeedbackForm';
-
-// Animation variants
-const fadeInUp = {
-  hidden: { y: 60, opacity: 0 },
-  visible: {
-    y: 0,
-    opacity: 1,
-    transition: { 
-      type: "spring" as const,
-      stiffness: 100,
-      damping: 15,
-      duration: 0.8
-    }
-  }
-};
-
-const staggerContainer = {
-  hidden: { opacity: 0 },
-  visible: {
-    opacity: 1,
-    transition: {
-      staggerChildren: 0.2,
-      delayChildren: 0.1
-    }
-  }
-};
+import Reveal from '@/components/common/Reveal';
 
 export default function Feedback() {
+  useEffect(() => { document.title = 'Feedback | IBB+ Impact Business Breakfast'; }, []);
   return (
-    <main className="min-h-screen bg-gradient-to-br from-gray-900 via-black to-gray-800 text-white font-poppins relative overflow-hidden">
-      {/* Background Pattern */}
-      <div className="absolute inset-0 opacity-5">
-        <div className="absolute inset-0" style={{
-          backgroundImage: `url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.1'%3E%3Ccircle cx='30' cy='30' r='2'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")`
-        }}></div>
-      </div>
-
-      {/* Hero Section */}
-      <section className="relative pt-20 pb-16">
-        <Container className='px-4'>
-          <motion.div 
-            initial="hidden"
-            animate="visible"
-            variants={staggerContainer}
-            className="text-center max-w-4xl mx-auto"
-          >
-            <motion.div variants={fadeInUp} className="mb-8">
-              <div className="flex justify-center mb-6">
-                <div className="w-20 h-20 bg-gradient-to-br from-[#768f00] to-[#5a6f00] rounded-full flex items-center justify-center shadow-lg">
-                  <MessageSquare className="h-10 w-10 text-white" />
-                </div>
-              </div>
-              <h1 className="text-5xl md:text-6xl font-bold bg-gradient-to-r from-white via-gray-200 to-[#768f00] bg-clip-text text-transparent mb-6">
-                Share Your Feedback
-              </h1>
-              <p className="text-xl text-gray-300 leading-relaxed">
-                Your opinion matters to us. Help us improve by sharing your thoughts, experiences, and suggestions.
-              </p>
-            </motion.div>
-          </motion.div>
+    <>
+      <section className="border-b border-stone bg-ivory">
+        <Container className="py-16 sm:py-20">
+          <p className="eyebrow">Feedback</p>
+          <h1 className="mt-5 max-w-2xl font-display text-4xl font-semibold leading-[1.1] text-navy sm:text-5xl">Tell us how we did</h1>
+          <p className="mt-5 max-w-2xl text-lg leading-relaxed text-ink-muted">Your views on the sessions, the speakers and the format shape the next edition. It takes two minutes.</p>
         </Container>
       </section>
-
-      {/* Feedback Form Section */}
-      <motion.div 
-        initial="hidden"
-        whileInView="visible"
-        viewport={{ once: true, margin: "-100px" }}
-        variants={staggerContainer}
-        className="py-20 bg-[oklch(0.473_0.137_46.201)]"
-      >
-        <Container className='px-4'>
-          <div className="max-w-3xl mx-auto">
-            <FeedbackForm 
-              title="We'd Love to Hear From You"
-              description="Please fill out the form below to share your feedback. All submissions are reviewed and help us improve our services and events."
-            />
+      <section className="section bg-ivory">
+        <Container>
+          <div className="grid gap-12 lg:grid-cols-12 lg:gap-16">
+            <Reveal className="lg:col-span-4">
+              <h2 className="text-xs font-semibold uppercase tracking-[0.18em] text-ink">What we ask</h2>
+              <ul className="mt-5 space-y-4 text-ink-muted">
+                <li><span className="font-semibold text-ink">Event feedback.</span> The programme, speakers and venue.</li>
+                <li><span className="font-semibold text-ink">General feedback.</span> Anything about IBB+ as a platform.</li>
+                <li><span className="font-semibold text-ink">Service feedback.</span> Registration, communication and follow-up.</li>
+              </ul>
+              <p className="mt-8 text-sm leading-relaxed text-ink-muted">Prefer to speak to someone? Call <a href="tel:+255748111183" className="font-semibold text-navy">+255 748 111 183</a> or email <a href="mailto:ibb@impactadvisory.co.tz" className="font-semibold text-navy">ibb@impactadvisory.co.tz</a>.</p>
+            </Reveal>
+            <Reveal delay={0.1} className="lg:col-span-8">
+              <FeedbackForm title="Share your feedback" />
+            </Reveal>
           </div>
         </Container>
-      </motion.div>
-
-      {/* Why Feedback Matters Section */}
-      <section className="relative py-16">
-        <Container className='px-4'>
-          <motion.div 
-            initial="hidden"
-            whileInView="visible"
-            viewport={{ once: true, margin: "-100px" }}
-            variants={staggerContainer}
-            className="max-w-6xl mx-auto"
-          >
-            <motion.div variants={fadeInUp} className="text-center mb-12">
-              <h2 className="text-3xl sm:text-4xl font-bold text-white mb-4">
-                Why Your Feedback Matters
-              </h2>
-              <p className="text-gray-300 text-lg max-w-2xl mx-auto">
-                Your insights help us create better experiences and drive positive change in our community.
-              </p>
-            </motion.div>
-
-            <div className="grid md:grid-cols-3 gap-6 sm:gap-8">
-              <motion.div 
-                variants={fadeInUp}
-                className="bg-gradient-to-br from-gray-800/50 to-gray-900/50 backdrop-blur-sm rounded-xl p-6 sm:p-8 border border-gray-700/50 hover:border-[#768f00]/50 transition-all duration-300"
-              >
-                <div className="w-14 h-14 bg-[#768f00] rounded-full flex items-center justify-center mb-4">
-                  <Star className="h-7 w-7 text-white" />
-                </div>
-                <h3 className="text-xl font-bold text-white mb-3">Improve Quality</h3>
-                <p className="text-gray-300 text-sm sm:text-base leading-relaxed">
-                  Your feedback helps us identify areas for improvement and enhance the quality of our events and services.
-                </p>
-              </motion.div>
-
-              <motion.div 
-                variants={fadeInUp}
-                className="bg-gradient-to-br from-gray-800/50 to-gray-900/50 backdrop-blur-sm rounded-xl p-6 sm:p-8 border border-gray-700/50 hover:border-[#768f00]/50 transition-all duration-300"
-              >
-                <div className="w-14 h-14 bg-[#768f00] rounded-full flex items-center justify-center mb-4">
-                  <Heart className="h-7 w-7 text-white" />
-                </div>
-                <h3 className="text-xl font-bold text-white mb-3">Better Experience</h3>
-                <p className="text-gray-300 text-sm sm:text-base leading-relaxed">
-                  We use your suggestions to create more meaningful and enjoyable experiences for all participants.
-                </p>
-              </motion.div>
-
-              <motion.div 
-                variants={fadeInUp}
-                className="bg-gradient-to-br from-gray-800/50 to-gray-900/50 backdrop-blur-sm rounded-xl p-6 sm:p-8 border border-gray-700/50 hover:border-[#768f00]/50 transition-all duration-300"
-              >
-                <div className="w-14 h-14 bg-[#768f00] rounded-full flex items-center justify-center mb-4">
-                  <TrendingUp className="h-7 w-7 text-white" />
-                </div>
-                <h3 className="text-xl font-bold text-white mb-3">Drive Innovation</h3>
-                <p className="text-gray-300 text-sm sm:text-base leading-relaxed">
-                  Your ideas and perspectives inspire new initiatives and innovative solutions for our community.
-                </p>
-              </motion.div>
-            </div>
-          </motion.div>
-        </Container>
       </section>
-
-      {/* Bottom CTA Section */}
-      <section className="relative py-16">
-        <Container>
-          <motion.div 
-            initial="hidden"
-            animate="visible"
-            variants={fadeInUp}
-            className="text-center bg-gradient-to-r from-gray-800/50 to-gray-900/50 backdrop-blur-sm rounded-2xl p-12 border border-gray-700/50"
-          >
-            <MessageSquare className="h-16 w-16 text-[#768f00] mx-auto mb-6" />
-            <h3 className="text-3xl font-bold text-white mb-4">
-              Your Voice Makes a Difference
-            </h3>
-            <p className="text-gray-300 text-lg max-w-2xl mx-auto leading-relaxed">
-              Every piece of feedback is valuable. Together, we can build a stronger, more impactful community 
-              that creates lasting positive change.
-            </p>
-          </motion.div>
-        </Container>
-      </section>
-    </main>
+    </>
   );
 }
-

@@ -24,26 +24,26 @@ function LoginCard({ onSuccess }: { onSuccess: () => void }) {
   };
 
   return (
-    <div className="max-w-md mx-auto bg-black/20 backdrop-blur-sm p-8 rounded-lg border border-white/10">
+    <div className="max-w-md mx-auto bg-white p-8 rounded-sm border border-stone shadow-sm">
       <div className="flex items-center gap-3 mb-6">
-        <div className="w-12 h-12 bg-[#768f00] rounded-full flex items-center justify-center"><Lock className="h-6 w-6 text-white" /></div>
+        <div className="w-12 h-12 bg-navy rounded-full flex items-center justify-center"><Lock className="h-6 w-6 text-white" /></div>
         <div>
-          <h1 className="text-2xl font-bold">Gala Dashboard</h1>
-          <p className="text-sm text-gray-300">Enter the admin password to continue.</p>
+          <h1 className="font-display text-2xl font-semibold text-navy">Gala Dashboard</h1>
+          <p className="text-sm text-ink-muted">Enter the admin password to continue.</p>
         </div>
       </div>
       {error && (
-        <div className="mb-4 p-3 bg-red-500/20 border border-red-500/30 rounded-lg flex items-center gap-2 text-red-400 text-sm">
+        <div className="mb-4 p-3 bg-red-50 border border-red-200 rounded-lg flex items-center gap-2 text-red-600 text-sm">
           <AlertCircle className="h-4 w-4" />{error}
         </div>
       )}
       <form onSubmit={submit} className="space-y-4">
         <div>
-          <Label htmlFor="admin-password" className="text-white font-semibold mb-2 block">Password</Label>
+          <Label htmlFor="admin-password" className="field-label">Password</Label>
           <Input id="admin-password" type="password" value={password} onChange={(e) => setPassword(e.target.value)} autoFocus autoComplete="current-password"
-            className="w-full bg-white/20 border-white/30 text-white focus:border-[#768f00]" />
+            className="field" />
         </div>
-        <Button type="submit" disabled={busy || !password} className="w-full bg-[#768f00] hover:bg-[#768f00]/90 text-white py-3 font-semibold">
+        <Button type="submit" disabled={busy || !password} className="btn-primary w-full py-3">
           {busy ? <Loader2 className="h-5 w-5 animate-spin" /> : 'Sign in'}
         </Button>
       </form>
@@ -53,13 +53,13 @@ function LoginCard({ onSuccess }: { onSuccess: () => void }) {
 
 function StatCard({ icon: Icon, label, value, sub }: { icon: ElementType; label: string; value: string | number; sub?: string }) {
   return (
-    <div className="bg-black/20 backdrop-blur-sm p-5 rounded-lg border border-white/10">
+    <div className="bg-white p-5 rounded-sm border border-stone">
       <div className="flex items-center gap-3 mb-2">
-        <div className="w-9 h-9 bg-[#768f00]/30 rounded-full flex items-center justify-center"><Icon className="h-4 w-4 text-[#b7d33a]" /></div>
-        <span className="text-sm text-gray-300">{label}</span>
+        <div className="w-9 h-9 bg-sand rounded-full flex items-center justify-center"><Icon className="h-4 w-4 text-navy" /></div>
+        <span className="text-sm text-ink-muted">{label}</span>
       </div>
-      <div className="text-3xl font-bold text-white">{value}</div>
-      {sub && <div className="text-xs text-gray-400 mt-1">{sub}</div>}
+      <div className="font-display text-3xl font-semibold text-navy">{value}</div>
+      {sub && <div className="text-xs text-ink-muted mt-1">{sub}</div>}
     </div>
   );
 }
@@ -107,7 +107,7 @@ export default function AdminDashboard() {
 
   if (!signedIn) {
     return (
-      <main className="min-h-screen bg-gradient-to-br from-gray-900 via-black to-gray-800 text-white font-poppins">
+      <main className="min-h-screen bg-ivory text-ink">
         <Container className="py-24 px-4"><LoginCard onSuccess={() => setSignedIn(true)} /></Container>
       </main>
     );
@@ -116,26 +116,26 @@ export default function AdminDashboard() {
   const types = stats?.byRegistrationType || {};
 
   return (
-    <main className="min-h-screen bg-gradient-to-br from-gray-900 via-black to-gray-800 text-white font-poppins">
+    <main className="min-h-screen bg-ivory text-ink">
       <Container className="py-12 px-4">
         <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="flex flex-wrap items-center justify-between gap-4 mb-8">
           <div>
-            <h1 className="text-3xl font-bold">Gala Registrations</h1>
-            <p className="text-gray-300 text-sm">Impact Business Awards Gala sign-ups submitted on ibbplus.com</p>
+            <h1 className="font-display text-3xl font-semibold text-navy">Gala Registrations</h1>
+            <p className="text-ink-muted text-sm">Impact Business Awards Gala sign-ups submitted on ibbplus.com</p>
           </div>
           <div className="flex gap-2">
-            <Button variant="outline" onClick={load} disabled={loading} className="border-white/30 text-white hover:bg-white/10">
+            <Button variant="outline" onClick={load} disabled={loading} className="btn-outline">
               <RefreshCw className={`h-4 w-4 mr-2 ${loading ? 'animate-spin' : ''}`} />Refresh
             </Button>
             <a href={adminApi.csvUrl()} download>
-              <Button className="bg-[#768f00] hover:bg-[#768f00]/90 text-white"><Download className="h-4 w-4 mr-2" />Export CSV</Button>
+              <Button className="btn-primary"><Download className="h-4 w-4 mr-2" />Export CSV</Button>
             </a>
-            <Button variant="outline" onClick={signOut} className="border-white/30 text-white hover:bg-white/10"><LogOut className="h-4 w-4 mr-2" />Sign out</Button>
+            <Button variant="outline" onClick={signOut} className="btn-outline"><LogOut className="h-4 w-4 mr-2" />Sign out</Button>
           </div>
         </motion.div>
 
         {error && (
-          <div className="mb-6 p-4 bg-red-500/20 border border-red-500/30 rounded-lg flex items-center gap-2 text-red-400"><AlertCircle className="h-5 w-5" />{error}</div>
+          <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg flex items-center gap-2 text-red-600"><AlertCircle className="h-5 w-5" />{error}</div>
         )}
 
         {stats && (
@@ -150,27 +150,27 @@ export default function AdminDashboard() {
           </div>
         )}
 
-        <div className="bg-black/20 backdrop-blur-sm rounded-lg border border-white/10">
+        <div className="bg-white rounded-sm border border-stone">
           <div className="p-4 flex flex-wrap gap-3 items-center border-b border-white/10">
             <div className="relative flex-1 min-w-[220px]">
-              <Search className="h-4 w-4 text-gray-400 absolute left-3 top-1/2 -translate-y-1/2" />
+              <Search className="h-4 w-4 text-ink-muted absolute left-3 top-1/2 -translate-y-1/2" />
               <Input value={query} onChange={(e) => setQuery(e.target.value)} placeholder="Search name, email, phone, organisation..."
-                className="pl-9 bg-white/10 border-white/20 text-white placeholder:text-gray-400 focus:border-[#768f00]" />
+                className="field pl-9" />
             </div>
             <div className="flex gap-1">
               {['All', 'Individual', 'Corporate Table'].map((t) => (
                 <button key={t} onClick={() => setTypeFilter(t)}
-                  className={`px-3 py-1.5 rounded-md text-sm transition-colors ${typeFilter === t ? 'bg-[#768f00] text-white' : 'bg-white/10 text-gray-300 hover:bg-white/20'}`}>
+                  className={`px-3 py-1.5 rounded-md text-sm transition-colors ${typeFilter === t ? 'bg-navy text-white' : 'bg-sand text-ink-muted hover:bg-stone'}`}>
                   {t}
                 </button>
               ))}
             </div>
-            <span className="text-sm text-gray-400 ml-auto">{filtered.length} of {rows.length}</span>
+            <span className="text-sm text-ink-muted ml-auto">{filtered.length} of {rows.length}</span>
           </div>
 
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
-              <thead className="text-left text-gray-300 bg-white/5">
+              <thead className="text-left text-ink-muted bg-sand/60">
                 <tr>
                   {['#', 'Submitted', 'Name', 'Contact', 'Organisation', 'Type', 'Payment', 'Amount', ''].map((h) => (
                     <th key={h} className="px-4 py-3 font-semibold whitespace-nowrap">{h}</th>
@@ -179,39 +179,39 @@ export default function AdminDashboard() {
               </thead>
               <tbody>
                 {loading && rows.length === 0 && (
-                  <tr><td colSpan={9} className="px-4 py-10 text-center text-gray-400"><Loader2 className="h-5 w-5 animate-spin inline mr-2" />Loading...</td></tr>
+                  <tr><td colSpan={9} className="px-4 py-10 text-center text-ink-muted"><Loader2 className="h-5 w-5 animate-spin inline mr-2" />Loading...</td></tr>
                 )}
                 {!loading && filtered.length === 0 && (
-                  <tr><td colSpan={9} className="px-4 py-10 text-center text-gray-400">{rows.length ? 'No registrations match your search.' : 'No registrations yet.'}</td></tr>
+                  <tr><td colSpan={9} className="px-4 py-10 text-center text-ink-muted">{rows.length ? 'No registrations match your search.' : 'No registrations yet.'}</td></tr>
                 )}
                 {filtered.map((r) => (
-                  <tr key={r.id} className="border-t border-white/10 hover:bg-white/5 align-top">
-                    <td className="px-4 py-3 text-gray-400">{r.id}</td>
-                    <td className="px-4 py-3 whitespace-nowrap text-gray-300">{fmtDate(r.created_at)}</td>
+                  <tr key={r.id} className="border-t border-stone hover:bg-sand/40 align-top">
+                    <td className="px-4 py-3 text-ink-muted">{r.id}</td>
+                    <td className="px-4 py-3 whitespace-nowrap text-ink-muted">{fmtDate(r.created_at)}</td>
                     <td className="px-4 py-3">
-                      <div className="font-medium text-white">{r.full_name}</div>
-                      {r.job_title && <div className="text-xs text-gray-400">{r.job_title}</div>}
+                      <div className="font-medium text-ink">{r.full_name}</div>
+                      {r.job_title && <div className="text-xs text-ink-muted">{r.job_title}</div>}
                     </td>
                     <td className="px-4 py-3">
-                      <a href={`mailto:${r.email}`} className="text-[#b7d33a] hover:underline block">{r.email}</a>
-                      <a href={`tel:${r.phone}`} className="text-gray-300 hover:underline">{r.phone}</a>
+                      <a href={`mailto:${r.email}`} className="text-navy hover:underline block">{r.email}</a>
+                      <a href={`tel:${r.phone}`} className="text-ink-muted hover:underline">{r.phone}</a>
                     </td>
-                    <td className="px-4 py-3 text-gray-200">{r.organisation}</td>
+                    <td className="px-4 py-3 text-ink">{r.organisation}</td>
                     <td className="px-4 py-3 whitespace-nowrap">
-                      <span className={`px-2 py-1 rounded text-xs font-semibold ${r.registration_type === 'Corporate Table' ? 'bg-[oklch(0.473_0.137_46.201)]/40 text-orange-200' : 'bg-[#768f00]/30 text-[#d4e67a]'}`}>
+                      <span className={`px-2 py-1 rounded text-xs font-semibold ${r.registration_type === 'Corporate Table' ? 'bg-gold/20 text-navy' : 'bg-sand text-ink'}`}>
                         {r.registration_type}
                       </span>
                     </td>
-                    <td className="px-4 py-3 text-gray-300 whitespace-nowrap">{r.payment_method || '—'}</td>
-                    <td className="px-4 py-3 text-gray-300 whitespace-nowrap">{r.amount || '—'}</td>
+                    <td className="px-4 py-3 text-ink-muted whitespace-nowrap">{r.payment_method || '—'}</td>
+                    <td className="px-4 py-3 text-ink-muted whitespace-nowrap">{r.amount || '—'}</td>
                     <td className="px-4 py-3 whitespace-nowrap">
                       {pendingDelete === r.id ? (
                         <span className="flex gap-1">
                           <button onClick={() => remove(r.id)} className="px-2 py-1 rounded bg-red-600 hover:bg-red-500 text-white text-xs">Confirm</button>
-                          <button onClick={() => setPendingDelete(null)} className="px-2 py-1 rounded bg-white/10 hover:bg-white/20 text-xs">Cancel</button>
+                          <button onClick={() => setPendingDelete(null)} className="px-2 py-1 rounded bg-sand hover:bg-stone text-xs">Cancel</button>
                         </span>
                       ) : (
-                        <button onClick={() => setPendingDelete(r.id)} title="Delete" className="p-1.5 rounded text-gray-400 hover:text-red-400 hover:bg-red-500/10">
+                        <button onClick={() => setPendingDelete(r.id)} title="Delete" className="p-1.5 rounded text-ink-muted hover:text-red-600 hover:bg-red-500/10">
                           <Trash2 className="h-4 w-4" />
                         </button>
                       )}

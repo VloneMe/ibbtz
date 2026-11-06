@@ -21,7 +21,7 @@ export default function SponsorModal({ isOpen, onClose, onSuccess }: SponsorModa
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="max-w-4xl w-full max-h-[90vh] overflow-y-auto bg-white/55">
+      <DialogContent className="max-w-4xl w-full max-h-[90vh] overflow-y-auto bg-white border-stone">
         <DialogHeader>
           <DialogTitle className="sr-only">Sponsor Registration</DialogTitle>
           <button
@@ -33,7 +33,7 @@ export default function SponsorModal({ isOpen, onClose, onSuccess }: SponsorModa
           </button>
         </DialogHeader>
         
-        <div className="border-t border-[oklch(0.473_0.137_46.201)]/20 bg-[#011839]">
+        <div>
           <SponsorForm 
             onSuccess={handleSuccess}
             onCancel={onClose}

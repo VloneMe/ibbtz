@@ -1,158 +1,78 @@
-import { motion } from 'framer-motion';
-import { useState } from 'react';
-import { Link } from 'react-router-dom';
-import { Button } from '@/components/ui/button';
+import { useEffect, useState } from 'react';
+import { Link, NavLink, useLocation } from 'react-router-dom';
 import { Menu, X } from 'lucide-react';
 import { Logo } from './Logo';
 
-interface NavigationProps {
-  onRegisterClick?: () => void;
-}
+const links = [
+  { to: '/', label: 'Home' },
+  { to: '/aboutus', label: 'About' },
+  { to: '/gala', label: 'Awards Gala' },
+  { to: '/contactus', label: 'Contact' },
+];
 
-const Navigation = (_props: NavigationProps) => {
-  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+const Navigation = () => {
+  const [open, setOpen] = useState(false);
+  const [scrolled, setScrolled] = useState(false);
+  const { pathname } = useLocation();
+
+  useEffect(() => { setOpen(false); }, [pathname]);
+  useEffect(() => {
+    const onScroll = () => setScrolled(window.scrollY > 8);
+    onScroll();
+    window.addEventListener('scroll', onScroll, { passive: true });
+    return () => window.removeEventListener('scroll', onScroll);
+  }, []);
+  useEffect(() => {
+    document.body.style.overflow = open ? 'hidden' : '';
+    return () => { document.body.style.overflow = ''; };
+  }, [open]);
+
+  const linkClass = ({ isActive }: { isActive: boolean }) =>
+    `text-[0.8rem] font-semibold uppercase tracking-[0.14em] transition-colors ${isActive ? 'text-navy' : 'text-ink-muted hover:text-navy'}`;
 
   return (
-    <motion.div 
-      initial={{ opacity: 0, y: -20 }}
-      animate={{ opacity: 1, y: 0 }}
-      className="fixed top-0 left-0 right-0 h-[6rem] z-50 bg-[#012557]/65 backdrop-blur-sm border-b border-[oklch(0.473_0.137_46.201)]/20"
-    >
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex items-center justify-between py-4">
-          <Link to="/" className="flex items-center gap-3">
-            <Logo
-              // size="lg"
-              className='max-w-[10rem] w-full'
-            />
-          </Link>
-          
-          {/* Desktop CTA Button */}
-          <div className="hidden lg:flex items-center gap-4">
-            {/* Desktop Navigation */}
-            <nav className="hidden lg:flex items-center gap-8">
-              <Link to="/" className="text-white hover:text-[#768f00] transition-colors">HOME</Link>
-              <Link to="/aboutus" className="text-white hover:text-[#768f00] transition-colors">ABOUT</Link>
-              {/* <Link to="/ibb" className="text-white hover:text-[#768f00] transition-colors">EVENTS</Link> */}
-              {/* <Link to="/gallery" className="text-white hover:text-[#768f00] transition-colors">GALLERY</Link> */}
-              <Link to="/contactus" className="text-white hover:text-[#768f00] transition-colors">CONTACT</Link>
-              <Link to="/gala" className="text-white hover:text-[#768f00] transition-colors">GALA</Link>
-              <a 
-                href="https://impactadvisory.co.tz" 
-                target="_blank" 
-                rel="noopener noreferrer"
-                className="text-[#768f00] hover:text-white transition-colors border-l-2 border-[#768f00] pl-4"
-              >
-                IMPACT ADVISORY
-              </a>
-            </nav>
-            
-            <Link to="/feedback">
-              <Button 
-                className="bg-[oklch(0.473_0.137_46.201)] hover:bg-[oklch(0.4_0.15_46.201)] text-white px-6 py-2"
-              >
-                FEEDBACK
-              </Button>
-            </Link>
-          </div>
-          
-          {/* Mobile Menu Button */}
-          <button
-            onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-            className="lg:hidden text-white p-2"
-          >
-            {mobileMenuOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
-          </button>
+    <header className={`sticky top-0 z-50 border-b bg-ivory/95 backdrop-blur transition-shadow ${scrolled ? 'border-stone shadow-[0_1px_0_0_rgba(0,0,0,0.04)]' : 'border-transparent'}`}>
+      <div className="mx-auto flex h-[4.5rem] max-w-7xl items-center justify-between px-5 sm:px-8 lg:px-10">
+        <Link to="/" aria-label="IBB+ home" className="shrink-0">
+          <Logo size="md" imgClasses="h-9 sm:h-10" />
+        </Link>
+
+        <nav className="hidden items-center gap-8 lg:flex" aria-label="Primary">
+          {links.map((l) => (
+            <NavLink key={l.to} to={l.to} end={l.to === '/'} className={linkClass}>{l.label}</NavLink>
+          ))}
+          <a href="https://impactadvisory.co.tz" target="_blank" rel="noopener noreferrer" className="text-[0.8rem] font-semibold uppercase tracking-[0.14em] text-ink-muted hover:text-navy">
+            Impact Advisory
+          </a>
+        </nav>
+
+        <div className="hidden items-center gap-3 lg:flex">
+          <Link to="/feedback" className="btn-outline px-5 py-2.5">Feedback</Link>
+          <Link to="/gala" className="btn-primary px-5 py-2.5">Register for the Gala</Link>
         </div>
-        
-        {/* Mobile Navigation Menu */}
-        {mobileMenuOpen && (
-          <>
-            {/* Backdrop */}
-            <motion.div 
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              className="fixed inset-0 bg-black/50 backdrop-blur-sm z-40 lg:hidden"
-              onClick={() => setMobileMenuOpen(false)}
-            />
-            
-            {/* Mobile Menu */}
-            <motion.div 
-              initial={{ opacity: 0, y: -20 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -20 }}
-              className="lg:hidden border-t border-[oklch(0.473_0.137_46.201)]/20 py-4 bg-[#012557]/95 backdrop-blur-md relative z-50 px-4"
-            >
-              <nav className="flex flex-col space-y-4">
-                <Link 
-                  to="/" 
-                  className="text-white hover:text-[#768f00] transition-colors py-2"
-                  onClick={() => setMobileMenuOpen(false)}
-                >
-                  HOME
-                </Link>
-                <Link 
-                  to="/aboutus" 
-                  className="text-white hover:text-[#768f00] transition-colors py-2"
-                  onClick={() => setMobileMenuOpen(false)}
-                >
-                  ABOUT
-                </Link>
-                <Link hidden={true}
-                  to="/ibb" 
-                  className="text-white hover:text-[#768f00] transition-colors py-2"
-                  onClick={() => setMobileMenuOpen(false)}
-                >
-                  EVENTS
-                </Link>
-                <Link hidden={true}
-                  to="/gallery" 
-                  className="text-white hover:text-[#768f00] transition-colors py-2"
-                  onClick={() => setMobileMenuOpen(false)}
-                >
-                  GALLERY
-                </Link>
-                <Link 
-                  to="/contactus" 
-                  className="text-white hover:text-[#768f00] transition-colors py-2"
-                  onClick={() => setMobileMenuOpen(false)}
-                >
-                  CONTACT
-                </Link>
-                <Link 
-                  to="/gala" 
-                  className="text-white hover:text-[#768f00] transition-colors py-2"
-                  onClick={() => setMobileMenuOpen(false)}
-                >
-                  GALA REGISTRATION
-                </Link>
-                <a 
-                  href="https://impactadvisory.co.tz" 
-                  target="_blank" 
-                  rel="noopener noreferrer"
-                  className="text-[#768f00] hover:text-white transition-colors py-2 border-l-2 border-[#768f00] pl-4"
-                  onClick={() => setMobileMenuOpen(false)}
-                >
-                  IMPACT ADVISORY
-                </a>
-                <Link 
-                  to="/feedback"
-                  onClick={() => setMobileMenuOpen(false)}
-                  className="w-full mt-4"
-                >
-                  <Button 
-                    className="bg-[oklch(0.473_0.137_46.201)] hover:bg-[oklch(0.4_0.15_46.201)] text-white px-6 py-2 w-full"
-                  >
-                    FEEDBACK
-                  </Button>
-                </Link>
-              </nav>
-            </motion.div>
-          </>
-        )}
+
+        <button type="button" onClick={() => setOpen((v) => !v)} className="-mr-2 rounded-sm p-2 text-navy lg:hidden" aria-expanded={open} aria-controls="mobile-nav" aria-label={open ? 'Close menu' : 'Open menu'}>
+          {open ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
+        </button>
       </div>
-    </motion.div>
+
+      {open && (
+        <div id="mobile-nav" className="border-t border-stone bg-ivory lg:hidden">
+          <nav className="mx-auto flex max-w-7xl flex-col px-5 py-4 sm:px-8" aria-label="Mobile">
+            {links.map((l) => (
+              <NavLink key={l.to} to={l.to} end={l.to === '/'} className={({ isActive }) => `border-b border-stone/70 py-3.5 text-base font-semibold ${isActive ? 'text-navy' : 'text-ink'}`}>
+                {l.label}
+              </NavLink>
+            ))}
+            <a href="https://impactadvisory.co.tz" target="_blank" rel="noopener noreferrer" className="border-b border-stone/70 py-3.5 text-base font-semibold text-ink">Impact Advisory</a>
+            <div className="mt-4 grid grid-cols-2 gap-3">
+              <Link to="/feedback" className="btn-outline">Feedback</Link>
+              <Link to="/gala" className="btn-primary">Register</Link>
+            </div>
+          </nav>
+        </div>
+      )}
+    </header>
   );
 };
 

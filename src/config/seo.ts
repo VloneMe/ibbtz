@@ -3,12 +3,12 @@
 export const seoConfig = {
   site: {
     name: "IBB+ | Impact Business Breakfast - Tanzania",
-    url: "https://ibb.impactadvisory.co.tz",
-    logo: "https://ibb.impactadvisory.co.tz/impactlogo.png",
+    url: "https://ibbplus.com",
+    logo: "https://ibbplus.com/og-home.jpg",
     description: "IBB+ (Impact Business Breakfast) - Tanzania's premier business networking platform. Ideals Beyond Ideas. Connect with 500+ industry leaders, entrepreneurs, and decision-makers in Dar es Salaam.",
     tagline: "Ideals Beyond Ideas",
     // Enhanced SEO properties
-    domain: "ibb.impactadvisory.co.tz",
+    domain: "ibbplus.com",
     language: "en",
     alternateLanguages: ["sw"],
     country: "TZ",
@@ -29,7 +29,7 @@ export const seoConfig = {
       title: "IBB+ Tanzania | Impact Business Breakfast - Ideals Beyond Ideas",
       description: "IBB+ (Impact Business Breakfast) is Tanzania's #1 business networking event in Dar es Salaam. Join 50+ CEOs, entrepreneurs & industry leaders. Individual: TZS 120,000 | Corporate Table: TZS 1,500,000. Expert speakers. Strategic partnerships. Catalyzing Vision 2050.",
       keywords: "IBB+, IBB Tanzania, Impact Business Breakfast, business networking Tanzania, business events Dar es Salaam, business breakfast Tanzania, entrepreneurship networking Tanzania, CEO networking Tanzania, business leaders Tanzania, Vision 2050 Tanzania, business forum Tanzania, professional networking Dar es Salaam, corporate networking events, business development Tanzania, East Africa business events, Tanzania business opportunities, ideals beyond ideas",
-      url: "https://ibb.impactadvisory.co.tz/",
+      url: "https://ibbplus.com/",
       // Enhanced SEO for home page
       priority: 1.0,
       changefreq: "weekly",
@@ -56,14 +56,14 @@ export const seoConfig = {
       title: "About IBB+ | Impact Business Breakfast Tanzania - Our Mission & Impact",
       description: "Learn about IBB+ (Impact Business Breakfast) - Tanzania's premier business networking platform. Catalyzing human capital development and building a knowledge-driven economy for Vision 2050. 14+ successful editions, 5000+ professionals connected.",
       keywords: "about IBB+, Impact Business Breakfast Tanzania, business networking platform Tanzania, Vision 2050 Tanzania, human capital development Tanzania, knowledge economy Tanzania, business leadership Tanzania, economic transformation Tanzania, Impact Advisory Africa",
-      url: "https://ibb.impactadvisory.co.tz/about",
+      url: "https://ibbplus.com/about",
     },
     
     events: {
       title: "IBB+ Events | Upcoming Business Networking Events in Tanzania 2025",
       description: "Discover upcoming IBB+ (Impact Business Breakfast) events in Tanzania. business networking sessions in Dar es Salaam. Meet industry leaders, gain insights, and build strategic partnerships. Register for upcoming events.",
       keywords: "IBB+ events, business events Tanzania 2025, networking events Dar es Salaam, Impact Business Breakfast schedule, business networking Tanzania, corporate events Tanzania, business conferences Tanzania, professional development events, CEO forums Tanzania, entrepreneurship events East Africa",
-      url: "https://ibb.impactadvisory.co.tz/events",
+      url: "https://ibbplus.com/events",
     },
     
     gallery: {
@@ -77,7 +77,7 @@ export const seoConfig = {
       title: "Contact IBB+ | Register for Impact Business Breakfast Events",
       description: "Contact IBB+ (Impact Business Breakfast) for event registration, partnerships, sponsorship opportunities, or inquiries. Located at Victoria, Noble Centre, Dar es Salaam. Email: ibb@impactadvisory.co.tz | Phone: +255 743 111 183",
       keywords: "contact IBB+, Impact Business Breakfast registration, IBB Tanzania contact, business networking registration Tanzania, event registration Dar es Salaam, business partnerships Tanzania, corporate sponsorship opportunities Tanzania",
-      url: "https://ibb.impactadvisory.co.tz/contact",
+      url: "https://ibbplus.com/contact",
     },
   },
   
@@ -85,9 +85,9 @@ export const seoConfig = {
     name: "IBB+ | Impact Business Breakfast Tanzania",
     alternateName: "IBB Tanzania",
     type: "Organization",
-    url: "https://ibb.impactadvisory.co.tz",
-    logo: "https://ibb.impactadvisory.co.tz/impactlogo.png",
-    image: "https://ibb.impactadvisory.co.tz/impactlogo.png",
+    url: "https://ibbplus.com",
+    logo: "https://ibbplus.com/og-home.jpg",
+    image: "https://ibbplus.com/og-home.jpg",
     description: "IBB+ (Impact Business Breakfast) - Tanzania's premier business networking and knowledge-sharing platform, fostering economic development and human capital growth. Ideals Beyond Ideas.",
     slogan: "Ideals Beyond Ideas",
     foundingDate: "2021",
@@ -138,7 +138,7 @@ export const seoConfig = {
     name: "IBB+ | Impact Business Breakfast",
     alternateName: "Impact Business Breakfast Tanzania",
     description: "Tanzania's premier monthly business networking event bringing together 500+ industry leaders, entrepreneurs, CEOs, and decision-makers to discuss critical issues affecting economic development and Vision 2050. Free registration.",
-    image: "https://ibb.impactadvisory.co.tz/impactlogo.png",
+    image: "https://ibbplus.com/og-home.jpg",
     startDate: "2025-12-04T08:00:00+03:00",
     endDate: "2025-12-04T12:00:00+03:00",
     location: {
@@ -161,7 +161,7 @@ export const seoConfig = {
     organizer: {
       "@type": "Organization",
       name: "Impact Advisory Africa",
-      url: "https://ibb.impactadvisory.co.tz",
+      url: "https://ibbplus.com",
     },
     offers: [
       {
@@ -170,7 +170,7 @@ export const seoConfig = {
         price: "120000",
         priceCurrency: "TZS",
         availability: "https://schema.org/InStock",
-        url: "https://ibb.impactadvisory.co.tz",
+        url: "https://ibbplus.com",
         validFrom: "2025-01-01T00:00:00+03:00",
       },
       {
@@ -179,7 +179,7 @@ export const seoConfig = {
         price: "1500000",
         priceCurrency: "TZS",
         availability: "https://schema.org/InStock",
-        url: "https://ibb.impactadvisory.co.tz",
+        url: "https://ibbplus.com",
         validFrom: "2025-01-01T00:00:00+03:00",
       }
     ],
@@ -198,9 +198,9 @@ export const seoConfig = {
   localBusiness: {
     "@type": "LocalBusiness",
     name: "IBB+ Tanzania",
-    image: "https://ibb.impactadvisory.co.tz/impactlogo.png",
-    "@id": "https://ibb.impactadvisory.co.tz",
-    url: "https://ibb.impactadvisory.co.tz",
+    image: "https://ibbplus.com/og-home.jpg",
+    "@id": "https://ibbplus.com",
+    url: "https://ibbplus.com",
     telephone: "+255743111183",
     priceRange: "TZS 120,000 - TZS 1,500,000",
     address: {
@@ -285,7 +285,7 @@ export const generateAdvancedStructuredData = () => {
           "@type": "ListItem",
           "position": 1,
           "name": "Home",
-          "item": "https://ibb.impactadvisory.co.tz/"
+          "item": "https://ibbplus.com/"
         }
       ]
     },
@@ -305,14 +305,14 @@ export const generateAdvancedStructuredData = () => {
         "name": "Impact Advisory Africa",
         "logo": {
           "@type": "ImageObject",
-          "url": "https://ibb.impactadvisory.co.tz/impactlogo.png"
+          "url": "https://ibbplus.com/og-home.jpg"
         }
       },
       "datePublished": "2025-11-28",
       "dateModified": new Date().toISOString(),
       "mainEntityOfPage": {
         "@type": "WebPage",
-        "@id": "https://ibb.impactadvisory.co.tz/"
+        "@id": "https://ibbplus.com/"
       }
     },
     
@@ -326,8 +326,8 @@ export const generateAdvancedStructuredData = () => {
         {
           "@type": "HowToStep",
           "name": "Visit IBB+ Website",
-          "text": "Go to ibb.impactadvisory.co.tz",
-          "url": "https://ibb.impactadvisory.co.tz"
+          "text": "Go to ibbplus.com",
+          "url": "https://ibbplus.com"
         },
         {
           "@type": "HowToStep",
@@ -432,7 +432,7 @@ export const generateStructuredData = (
     
     case 'breadcrumb':
       const items = breadcrumbItems || [
-        { name: "Home", url: "https://ibb.impactadvisory.co.tz/" }
+        { name: "Home", url: "https://ibbplus.com/" }
       ];
       
       return {
@@ -454,7 +454,7 @@ export const generateStructuredData = (
 // Generate breadcrumb helper
 export const generateBreadcrumb = (currentPage: string, currentUrl: string) => {
   return generateStructuredData('breadcrumb', [
-    { name: "Home", url: "https://ibb.impactadvisory.co.tz/" },
+    { name: "Home", url: "https://ibbplus.com/" },
     { name: currentPage, url: currentUrl },
   ]);
 };
