@@ -88,6 +88,14 @@ const HeroSection = ({ onViewAgenda }: HeroSectionProps) => {
 
           {/* Action Buttons */}
           <div className="flex flex-col sm:flex-row gap-3 sm:gap-4">
+            <Link to="/gala">
+              <Button 
+                size="lg" 
+                className="bg-[#768f00] hover:bg-[#768f00]/90 text-white px-6 sm:px-8 py-3 sm:py-4 text-base sm:text-lg w-full sm:w-auto font-semibold"
+              >
+                REGISTER FOR GALA
+              </Button>
+            </Link>
             <Link to="/feedback">
               <Button 
                 size="lg" 

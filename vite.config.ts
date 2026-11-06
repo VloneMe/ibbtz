@@ -13,6 +13,10 @@ export default defineConfig({
   },
   server: {
     proxy: {
+      // Gala registration + admin dashboard API (server/ in this repo)
+      '/api/gala': { target: 'http://localhost:5091', changeOrigin: true },
+      '/api/admin': { target: 'http://localhost:5091', changeOrigin: true },
+      '/api/health': { target: 'http://localhost:5091', changeOrigin: true },
       // Proxy API requests to local backend
       '/api': {
         target: 'http://localhost:5500/api/v1',

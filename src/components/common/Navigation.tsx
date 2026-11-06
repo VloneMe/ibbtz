@@ -36,6 +36,7 @@ const Navigation = (_props: NavigationProps) => {
               {/* <Link to="/ibb" className="text-white hover:text-[#768f00] transition-colors">EVENTS</Link> */}
               {/* <Link to="/gallery" className="text-white hover:text-[#768f00] transition-colors">GALLERY</Link> */}
               <Link to="/contactus" className="text-white hover:text-[#768f00] transition-colors">CONTACT</Link>
+              <Link to="/gala" className="text-white hover:text-[#768f00] transition-colors">GALA</Link>
               <a 
                 href="https://impactadvisory.co.tz" 
                 target="_blank" 
@@ -118,6 +119,13 @@ const Navigation = (_props: NavigationProps) => {
                   onClick={() => setMobileMenuOpen(false)}
                 >
                   CONTACT
+                </Link>
+                <Link 
+                  to="/gala" 
+                  className="text-white hover:text-[#768f00] transition-colors py-2"
+                  onClick={() => setMobileMenuOpen(false)}
+                >
+                  GALA REGISTRATION
                 </Link>
                 <a 
                   href="https://impactadvisory.co.tz" 

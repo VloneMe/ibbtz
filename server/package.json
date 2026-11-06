@@ -1,0 +1,17 @@
+{
+  "name": "ibbplus-api",
+  "private": true,
+  "version": "1.0.0",
+  "type": "module",
+  "description": "Gala registration API for ibbplus.com",
+  "scripts": {
+    "start": "node --no-warnings index.js",
+    "dev": "node --no-warnings --watch index.js"
+  },
+  "engines": {
+    "node": ">=22.13"
+  },
+  "dependencies": {
+    "express": "^5.1.0"
+  }
+}

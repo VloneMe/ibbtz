@@ -7,6 +7,8 @@ import Feedback from '../pages/Feedback'
 // import Events from '../pages/Events'
 import EventDetail from '../pages/EventDetail'
 import Gallery from '../pages/Gallery'
+import GalaRegistration from '../pages/GalaRegistration'
+import AdminDashboard from '../pages/AdminDashboard'
 import NotFound from '../pages/NotFound'
 
 export const router = createBrowserRouter([
@@ -41,6 +43,14 @@ export const router = createBrowserRouter([
       {
         path: 'feedback',
         element: <Feedback />,
+      },
+      {
+        path: 'gala',
+        element: <GalaRegistration />,
+      },
+      {
+        path: 'admin',
+        element: <AdminDashboard />,
       },
       {
         path: '*',
