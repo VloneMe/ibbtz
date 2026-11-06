@@ -11,6 +11,15 @@ export default defineConfig({
       "@": path.resolve(__dirname, "./src"),
     },
   },
+  build: {
+    rollupOptions: {
+      // Second HTML entry so /gala gets its own link-preview metadata (nginx serves gala.html for /gala)
+      input: {
+        main: path.resolve(__dirname, 'index.html'),
+        gala: path.resolve(__dirname, 'gala.html'),
+      },
+    },
+  },
   server: {
     proxy: {
       // Gala registration + admin dashboard API (server/ in this repo)
