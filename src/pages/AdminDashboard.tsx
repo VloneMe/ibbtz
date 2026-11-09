@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useState, type ElementType, type FormEvent } from 'react';
+import { Fragment, useCallback, useEffect, useMemo, useState, type ElementType, type FormEvent } from 'react';
 import { motion } from 'framer-motion';
 import { Container } from '../common/Container';
 import { Button } from '@/components/ui/button';
@@ -6,6 +6,8 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Lock, LogOut, RefreshCw, Download, Search, Trash2, Loader2, Users, User, Building2, Wallet, CalendarClock, AlertCircle } from 'lucide-react';
 import { adminApi, adminAuth, ApiError, type GalaRegistration, type GalaStats } from '@/services/galaApi';
+import { GALA_QUESTIONS, OTHER, parseInterests } from '@/data/galaQuestions';
+import { ChevronDown, ChevronUp } from 'lucide-react';
 
 const fmtTsh = (n: number) => `Tsh ${n.toLocaleString('en-US')}`;
 const fmtDate = (iso: string) => new Date(iso).toLocaleString('en-GB', { dateStyle: 'medium', timeStyle: 'short', timeZone: 'Africa/Dar_es_Salaam' });
@@ -73,6 +75,8 @@ export default function AdminDashboard() {
   const [query, setQuery] = useState('');
   const [typeFilter, setTypeFilter] = useState<string>('All');
   const [pendingDelete, setPendingDelete] = useState<number | null>(null);
+  const [expanded, setExpanded] = useState<number | null>(null);
+  const [showInterests, setShowInterests] = useState(false);
 
   useEffect(() => { document.title = 'Gala Registrations | Admin | IBB+'; }, []);
 
@@ -101,7 +105,7 @@ export default function AdminDashboard() {
     const q = query.trim().toLowerCase();
     return rows.filter((r) =>
       (typeFilter === 'All' || r.registration_type === typeFilter) &&
-      (!q || [r.full_name, r.email, r.phone, r.organisation, r.job_title, r.payment_method, r.amount].some((v) => (v || '').toLowerCase().includes(q))),
+      (!q || [r.full_name, r.email, r.phone, r.organisation, r.job_title, r.payment_method, r.amount, r.interests].some((v) => (v || '').toLowerCase().includes(q))),
     );
   }, [rows, query, typeFilter]);
 
@@ -150,8 +154,50 @@ export default function AdminDashboard() {
           </div>
         )}
 
+        {stats && (
+          <div className="mb-8 bg-white rounded-sm border border-stone">
+            <button type="button" onClick={() => setShowInterests((v) => !v)} className="flex w-full items-center justify-between px-5 py-4 text-left">
+              <span>
+                <span className="block font-display text-lg font-semibold text-navy">Career, business &amp; leadership interests</span>
+                <span className="text-sm text-ink-muted">How registrants answered questions 2 to 9</span>
+              </span>
+              {showInterests ? <ChevronUp className="h-5 w-5 text-ink-muted" /> : <ChevronDown className="h-5 w-5 text-ink-muted" />}
+            </button>
+            {showInterests && (
+              <div className="grid gap-8 border-t border-stone p-5 lg:grid-cols-2">
+                {GALA_QUESTIONS.map((q) => {
+                  const counts = stats.byQuestion?.[q.id] || {};
+                  const total = Object.values(counts).reduce((a, b) => a + b, 0);
+                  const max = Math.max(1, ...Object.values(counts));
+                  const opts = q.allowOther ? [...q.options, OTHER] : q.options;
+                  return (
+                    <div key={q.id}>
+                      <p className="font-semibold text-ink"><span className="mr-2 font-display text-gold">{q.number}.</span>{q.title}</p>
+                      <p className="mt-1 text-xs text-ink-muted">{total} selection{total === 1 ? '' : 's'}</p>
+                      <ul className="mt-3 space-y-2">
+                        {opts.map((o) => {
+                          const n = counts[o] || 0;
+                          return (
+                            <li key={o} className="text-sm">
+                              <div className="flex items-baseline justify-between gap-3">
+                                <span className="text-ink">{o}</span>
+                                <span className="shrink-0 tabular-nums text-ink-muted">{n}</span>
+                              </div>
+                              <div className="mt-1 h-1.5 rounded-full bg-sand"><div className="h-1.5 rounded-full bg-navy" style={{ width: `${(n / max) * 100}%` }} /></div>
+                            </li>
+                          );
+                        })}
+                      </ul>
+                    </div>
+                  );
+                })}
+              </div>
+            )}
+          </div>
+        )}
+
         <div className="bg-white rounded-sm border border-stone">
-          <div className="p-4 flex flex-wrap gap-3 items-center border-b border-white/10">
+          <div className="p-4 flex flex-wrap gap-3 items-center border-b border-stone">
             <div className="relative flex-1 min-w-[220px]">
               <Search className="h-4 w-4 text-ink-muted absolute left-3 top-1/2 -translate-y-1/2" />
               <Input value={query} onChange={(e) => setQuery(e.target.value)} placeholder="Search name, email, phone, organisation..."
@@ -184,9 +230,18 @@ export default function AdminDashboard() {
                 {!loading && filtered.length === 0 && (
                   <tr><td colSpan={9} className="px-4 py-10 text-center text-ink-muted">{rows.length ? 'No registrations match your search.' : 'No registrations yet.'}</td></tr>
                 )}
-                {filtered.map((r) => (
-                  <tr key={r.id} className="border-t border-stone hover:bg-sand/40 align-top">
-                    <td className="px-4 py-3 text-ink-muted">{r.id}</td>
+                {filtered.map((r) => {
+                  const { answers, other } = parseInterests(r.interests);
+                  const answered = Object.keys(answers).length;
+                  const isOpen = expanded === r.id;
+                  return (
+                  <Fragment key={r.id}>
+                  <tr className="border-t border-stone hover:bg-sand/40 align-top">
+                    <td className="px-4 py-3 text-ink-muted">
+                      <button type="button" onClick={() => setExpanded(isOpen ? null : r.id)} title={answered ? `${answered} interest answers` : 'No interest answers'} className="flex items-center gap-1 hover:text-navy">
+                        {r.id}{answered > 0 && (isOpen ? <ChevronUp className="h-3.5 w-3.5" /> : <ChevronDown className="h-3.5 w-3.5" />)}
+                      </button>
+                    </td>
                     <td className="px-4 py-3 whitespace-nowrap text-ink-muted">{fmtDate(r.created_at)}</td>
                     <td className="px-4 py-3">
                       <div className="font-medium text-ink">{r.full_name}</div>
@@ -217,7 +272,27 @@ export default function AdminDashboard() {
                       )}
                     </td>
                   </tr>
-                ))}
+                  {isOpen && (
+                    <tr className="bg-sand/30">
+                      <td colSpan={9} className="px-6 py-5">
+                        {answered === 0 ? (
+                          <p className="text-sm text-ink-muted">This registrant did not answer the interest questions.</p>
+                        ) : (
+                          <dl className="grid gap-x-10 gap-y-4 sm:grid-cols-2">
+                            {GALA_QUESTIONS.filter((q) => answers[q.id]?.length).map((q) => (
+                              <div key={q.id}>
+                                <dt className="text-xs font-semibold uppercase tracking-[0.14em] text-ink-muted">{q.number}. {q.title}</dt>
+                                <dd className="mt-1 text-sm text-ink">{answers[q.id].map((v) => (v === OTHER && other ? `Other: ${other}` : v)).join('; ')}</dd>
+                              </div>
+                            ))}
+                          </dl>
+                        )}
+                      </td>
+                    </tr>
+                  )}
+                  </Fragment>
+                  );
+                })}
               </tbody>
             </table>
           </div>

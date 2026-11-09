@@ -17,6 +17,8 @@ export const galaRegistrationSchema = z.object({
   registrationType: z.enum(REGISTRATION_TYPES, { message: 'Please choose a registration type' }),
   paymentMethod: z.enum(PAYMENT_METHODS).optional().or(z.literal('')),
   amount: z.enum(AMOUNTS).optional().or(z.literal('')),
+  interests: z.record(z.string(), z.array(z.string())).optional(),
+  interestsOther: z.string().trim().max(200).optional().or(z.literal('')),
 });
 export type GalaRegistrationInput = z.infer<typeof galaRegistrationSchema>;
 
@@ -30,6 +32,7 @@ export interface GalaRegistration {
   registration_type: string;
   payment_method: string | null;
   amount: string | null;
+  interests: string | null;
   created_at: string;
 }
 
@@ -40,6 +43,7 @@ export interface GalaStats {
   byAmount: Record<string, number>;
   expectedRevenueTsh: number;
   last7Days: number;
+  byQuestion: Record<string, Record<string, number>>;
 }
 
 export class ApiError extends Error {

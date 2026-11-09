@@ -7,6 +7,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Send, CheckCircle, AlertCircle, Loader2, Ticket, User, Users } from 'lucide-react';
+import { GALA_QUESTIONS, OTHER, type GalaQuestion } from '@/data/galaQuestions';
 import {
   galaApi, galaRegistrationSchema, ApiError,
   REGISTRATION_TYPES, PAYMENT_METHODS, AMOUNTS,
@@ -26,10 +27,10 @@ export default function GalaRegistrationForm({ className = '' }: { className?: s
   const [error, setError] = useState<string | null>(null);
   const [submittedId, setSubmittedId] = useState<number | null>(null);
 
-  const { register, handleSubmit, control, setValue, setError: setFieldError, getValues, formState: { errors } } =
+  const { register, handleSubmit, control, setValue, setError: setFieldError, getValues, watch, formState: { errors } } =
     useForm<GalaRegistrationInput>({
       resolver: zodResolver(galaRegistrationSchema),
-      defaultValues: { fullName: '', email: '', phone: '', organisation: '', jobTitle: '', registrationType: undefined, paymentMethod: '', amount: '' },
+      defaultValues: { fullName: '', email: '', phone: '', organisation: '', jobTitle: '', registrationType: undefined, paymentMethod: '', amount: '', interests: {}, interestsOther: '' },
       mode: 'onSubmit',
     });
 
@@ -168,6 +169,28 @@ export default function GalaRegistrationForm({ className = '' }: { className?: s
           {errors.registrationType && <p className="text-red-600 text-sm mt-1">{errors.registrationType.message}</p>}
         </fieldset>
 
+        {/* Career, business and leadership interests */}
+        <fieldset className="space-y-6">
+          <legend className="text-gold font-semibold uppercase tracking-[0.18em] text-xs mb-1">Career, Business &amp; Leadership Interests</legend>
+          <p className="text-sm text-ink-muted">Please select the responses that best reflect your interests and aspirations.</p>
+          {GALA_QUESTIONS.map((q) => (
+            <Controller
+              key={q.id}
+              name={`interests.${q.id}` as const}
+              control={control}
+              render={({ field }) => (
+                <QuestionField
+                  question={q}
+                  value={(field.value as string[] | undefined) || []}
+                  onChange={field.onChange}
+                  otherValue={q.allowOther ? (watch('interestsOther') || '') : undefined}
+                  onOtherChange={q.allowOther ? (v) => setValue('interestsOther', v) : undefined}
+                />
+              )}
+            />
+          ))}
+        </fieldset>
+
         {/* Payment Details */}
         <fieldset className="space-y-4">
           <legend className="text-gold font-semibold uppercase tracking-[0.18em] text-xs mb-2">Payment Details</legend>
@@ -217,6 +240,68 @@ export default function GalaRegistrationForm({ className = '' }: { className?: s
           {isSubmitting ? (<><Loader2 className="h-5 w-5 mr-2 animate-spin" />Submitting...</>) : (<><Send className="h-5 w-5 mr-2" />Submit Registration</>)}
         </Button>
       </form>
+    </div>
+  );
+}
+
+
+interface QuestionFieldProps {
+  question: GalaQuestion;
+  value: string[];
+  onChange: (v: string[]) => void;
+  otherValue?: string;
+  onOtherChange?: (v: string) => void;
+}
+
+function QuestionField({ question: q, value, onChange, otherValue, onOtherChange }: QuestionFieldProps) {
+  const options = q.allowOther ? [...q.options, OTHER] : q.options;
+  const atMax = q.type === 'multi' && value.length >= q.max;
+  const toggle = (opt: string) => {
+    if (q.type === 'single') { onChange(value[0] === opt ? [] : [opt]); return; }
+    if (value.includes(opt)) onChange(value.filter((v) => v !== opt));
+    else if (!atMax) onChange([...value, opt]);
+  };
+  const name = `q-${q.id}`;
+  return (
+    <div className="border-t border-stone pt-5">
+      <p className="font-semibold text-ink">
+        <span className="mr-2 font-display text-gold">{q.number}.</span>{q.title}
+      </p>
+      <p className="mt-1 text-xs font-semibold uppercase tracking-[0.14em] text-ink-muted">
+        {q.hint}{q.type === 'multi' && value.length > 0 ? ` · ${value.length} of ${q.max} selected` : ''}
+      </p>
+      <div className="mt-3 grid gap-2 sm:grid-cols-2">
+        {options.map((opt) => {
+          const checked = value.includes(opt);
+          const disabled = !checked && atMax;
+          return (
+            <label
+              key={opt}
+              className={`flex cursor-pointer items-start gap-3 rounded-sm border bg-white p-3 text-sm leading-snug transition-colors ${
+                checked ? 'border-navy bg-navy/5 text-ink' : 'border-stone text-ink hover:border-navy/40'
+              } ${disabled ? 'cursor-not-allowed opacity-50' : ''}`}
+            >
+              <input
+                type={q.type === 'single' ? 'radio' : 'checkbox'}
+                name={name}
+                value={opt}
+                checked={checked}
+                disabled={disabled}
+                onChange={() => toggle(opt)}
+                onClick={q.type === 'single' && checked ? () => toggle(opt) : undefined}
+                className="mt-0.5 h-4 w-4 shrink-0 accent-navy"
+              />
+              <span>{opt}</span>
+            </label>
+          );
+        })}
+      </div>
+      {q.allowOther && value.includes(OTHER) && onOtherChange && (
+        <div className="mt-3">
+          <Label htmlFor={`${name}-other`} className="field-label">Please specify</Label>
+          <Input id={`${name}-other`} value={otherValue || ''} onChange={(e) => onOtherChange(e.target.value)} maxLength={200} className="field" placeholder="Your answer" />
+        </div>
+      )}
     </div>
   );
 }

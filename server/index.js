@@ -4,6 +4,7 @@ import { createHmac, timingSafeEqual, randomBytes } from 'node:crypto';
 import { mkdirSync, existsSync, readFileSync } from 'node:fs';
 import { dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { GALA_QUESTIONS, OTHER } from './questions.js';
 
 // ---------------------------------------------------------------------------
 // Config (loaded from ./.env if present, then process.env)
@@ -51,11 +52,14 @@ db.exec(`
   CREATE INDEX IF NOT EXISTS idx_gala_created ON gala_registrations(created_at);
   CREATE INDEX IF NOT EXISTS idx_gala_email ON gala_registrations(email);
 `);
+// Add the interests column to databases created before it existed.
+const columns = db.prepare(`PRAGMA table_info(gala_registrations)`).all().map((c) => c.name);
+if (!columns.includes('interests')) db.exec(`ALTER TABLE gala_registrations ADD COLUMN interests TEXT`);
 
 const insertStmt = db.prepare(`
   INSERT INTO gala_registrations
-    (full_name, email, phone, organisation, job_title, registration_type, payment_method, amount, ip, user_agent)
-  VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+    (full_name, email, phone, organisation, job_title, registration_type, payment_method, amount, interests, ip, user_agent)
+  VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
 `);
 const listStmt = db.prepare(`SELECT * FROM gala_registrations ORDER BY created_at DESC, id DESC`);
 const deleteStmt = db.prepare(`DELETE FROM gala_registrations WHERE id = ?`);
@@ -88,6 +92,21 @@ function validateRegistration(body) {
   if (!REGISTRATION_TYPES.includes(data.registration_type)) errors.registrationType = 'Please choose a registration type';
   if (data.payment_method && !PAYMENT_METHODS.includes(data.payment_method)) errors.paymentMethod = 'Invalid payment method';
   if (data.amount && !AMOUNTS.includes(data.amount)) errors.amount = 'Invalid amount';
+
+  // Career, business and leadership interests (optional; validated against the question list)
+  const rawInterests = body.interests && typeof body.interests === 'object' ? body.interests : {};
+  const interests = {};
+  for (const q of GALA_QUESTIONS) {
+    const v = rawInterests[q.id];
+    if (!Array.isArray(v) || v.length === 0) continue;
+    const allowed = q.allowOther ? [...q.options, OTHER] : q.options;
+    const picked = [...new Set(v.filter((x) => typeof x === 'string' && allowed.includes(x)))];
+    if (picked.length > q.max) { errors[`interests.${q.id}`] = `Select up to ${q.max}`; continue; }
+    if (picked.length) interests[q.id] = picked;
+  }
+  const other = clean(body.interestsOther, 200);
+  if (other && interests.challenge?.includes(OTHER)) interests.challengeOther = other;
+  data.interests = Object.keys(interests).length ? JSON.stringify(interests) : null;
   return { data, errors };
 }
 
@@ -159,7 +178,7 @@ app.post('/api/gala/registrations', rateLimit({ windowMs: 60_000, max: 10 }), (r
   }
   const result = insertStmt.run(
     data.full_name, data.email, data.phone, data.organisation, data.job_title,
-    data.registration_type, data.payment_method, data.amount,
+    data.registration_type, data.payment_method, data.amount, data.interests,
     req.ip, clean(req.get('user-agent'), 300) || null,
   );
   const id = Number(result.lastInsertRowid);
@@ -186,15 +205,33 @@ app.get('/api/admin/registrations', requireAdmin, (_req, res) => {
     byAmount: countBy('amount'),
     expectedRevenueTsh: rows.reduce((sum, r) => sum + amountValue(r.amount), 0),
     last7Days: rows.filter((r) => Date.now() - Date.parse(r.created_at) < 7 * 86_400_000).length,
+    byQuestion: Object.fromEntries(GALA_QUESTIONS.map((q) => [q.id, {}])),
   };
+  for (const r of rows) {
+    let parsed = {};
+    try { parsed = r.interests ? JSON.parse(r.interests) : {}; } catch { parsed = {}; }
+    for (const q of GALA_QUESTIONS) {
+      for (const opt of parsed[q.id] || []) stats.byQuestion[q.id][opt] = (stats.byQuestion[q.id][opt] || 0) + 1;
+    }
+  }
   res.json({ success: true, stats, data: rows });
 });
 
 app.get('/api/admin/registrations.csv', requireAdmin, (_req, res) => {
   const rows = listStmt.all();
-  const cols = ['id', 'created_at', 'full_name', 'email', 'phone', 'organisation', 'job_title', 'registration_type', 'payment_method', 'amount'];
+  const base = ['id', 'created_at', 'full_name', 'email', 'phone', 'organisation', 'job_title', 'registration_type', 'payment_method', 'amount'];
+  const qCols = GALA_QUESTIONS.map((q) => `q${q.number}_${q.id}`);
   const esc = (v) => { const s = v == null ? '' : String(v); return /[",\n]/.test(s) ? `"${s.replace(/"/g, '""')}"` : s; };
-  const csv = [cols.join(','), ...rows.map((r) => cols.map((c) => esc(r[c])).join(','))].join('\n');
+  const rowValues = (r) => {
+    let parsed = {};
+    try { parsed = r.interests ? JSON.parse(r.interests) : {}; } catch { parsed = {}; }
+    const answers = GALA_QUESTIONS.map((q) => {
+      const vals = parsed[q.id] || [];
+      return vals.map((v) => (v === OTHER && parsed.challengeOther ? `Other: ${parsed.challengeOther}` : v)).join('; ');
+    });
+    return [...base.map((c) => r[c]), ...answers].map(esc).join(',');
+  };
+  const csv = [[...base, ...qCols].join(','), ...rows.map(rowValues)].join('\n');
   res.setHeader('Content-Type', 'text/csv; charset=utf-8');
   res.setHeader('Content-Disposition', `attachment; filename="gala-registrations-${new Date().toISOString().slice(0, 10)}.csv"`);
   res.send('﻿' + csv);
