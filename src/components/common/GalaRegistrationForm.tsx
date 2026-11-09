@@ -320,9 +320,12 @@ function PayBillDetails() {
       </p>
       <dl className="mt-3 grid gap-3 sm:grid-cols-2">
         {MOBILE_MONEY_PAYBILLS.map((m) => (
-          <div key={m.network} className="rounded-sm border border-stone bg-white px-4 py-3">
-            <dt className="text-xs font-medium uppercase tracking-wide text-ink-muted">{m.network}</dt>
-            <dd className="mt-1 font-display text-xl font-semibold tracking-wide text-navy">{m.number}</dd>
+          <div key={m.network} className="flex items-center gap-4 rounded-sm border border-stone bg-white px-4 py-3">
+            <img src={m.logo} alt={m.network} className="h-9 w-20 shrink-0 object-contain object-left" />
+            <div className="min-w-0">
+              <dt className="text-xs font-medium uppercase tracking-wide text-ink-muted">{m.network}</dt>
+              <dd className="mt-0.5 font-display text-xl font-semibold tracking-wide text-navy">{m.number}</dd>
+            </div>
           </div>
         ))}
       </dl>
