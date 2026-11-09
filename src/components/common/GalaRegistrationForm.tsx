@@ -13,6 +13,7 @@ import {
   REGISTRATION_TYPES, PAYMENT_METHODS, AMOUNTS,
   type GalaRegistrationInput,
 } from '@/services/galaApi';
+import { MOBILE_MONEY_PAYBILLS, PAYMENT_ACCOUNT_NAME } from '@/data/paymentDetails';
 
 const inputClass = (hasError: boolean) =>
   `field ${hasError ? 'border-red-500' : ''}`;
@@ -64,9 +65,12 @@ export default function GalaRegistrationForm({ className = '' }: { className?: s
           </div>
           <h3 className="font-display text-2xl sm:text-3xl font-semibold text-ink mb-4">Registration Received</h3>
           <p className="text-lg text-ink-muted mb-6 max-w-2xl mx-auto leading-relaxed">
-            Thank you for registering for the Impact Business Awards. Our team will be in touch with payment and event details.
+            Thank you for registering for the Impact Business Awards. Please complete your payment using the details below, quoting your reference. Our team will confirm by email.
           </p>
-          <p className="text-sm text-green-700">Reference: IBA-{String(submittedId).padStart(4, '0')}</p>
+          <p className="text-sm font-semibold text-green-700">Reference: IBA-{String(submittedId).padStart(4, '0')}</p>
+          <div className="mx-auto mt-6 max-w-md text-left">
+            <PayBillDetails />
+          </div>
         </motion.div>
       </div>
     );
@@ -234,6 +238,7 @@ export default function GalaRegistrationForm({ className = '' }: { className?: s
               />
             </div>
           </div>
+          <PayBillDetails />
         </fieldset>
 
         <Button type="submit" disabled={isSubmitting} className="w-full bg-navy hover:bg-navy-soft text-white py-4 text-base sm:text-lg font-semibold disabled:opacity-50 shadow-lg">
@@ -302,6 +307,26 @@ function QuestionField({ question: q, value, onChange, otherValue, onOtherChange
           <Input id={`${name}-other`} value={otherValue || ''} onChange={(e) => onOtherChange(e.target.value)} maxLength={200} className="field" placeholder="Your answer" />
         </div>
       )}
+    </div>
+  );
+}
+
+function PayBillDetails() {
+  return (
+    <div className="rounded-sm border border-gold/40 bg-sand/60 p-4 sm:p-5">
+      <p className="text-xs font-semibold uppercase tracking-[0.18em] text-navy">Mobile Money · Pay Bill</p>
+      <p className="mt-2 text-sm text-ink-muted">
+        Business name: <span className="font-semibold text-ink">{PAYMENT_ACCOUNT_NAME}</span>
+      </p>
+      <dl className="mt-3 grid gap-3 sm:grid-cols-2">
+        {MOBILE_MONEY_PAYBILLS.map((m) => (
+          <div key={m.network} className="rounded-sm border border-stone bg-white px-4 py-3">
+            <dt className="text-xs font-medium uppercase tracking-wide text-ink-muted">{m.network}</dt>
+            <dd className="mt-1 font-display text-xl font-semibold tracking-wide text-navy">{m.number}</dd>
+          </div>
+        ))}
+      </dl>
+      <p className="mt-3 text-xs leading-relaxed text-ink-muted">Bank transfer details are shared by email once your registration is received.</p>
     </div>
   );
 }

@@ -3,6 +3,7 @@ import { Container } from '../common/Container';
 import Reveal from '@/components/common/Reveal';
 import GalaRegistrationForm from '@/components/common/GalaRegistrationForm';
 import hero from '@/assets/photos/hero.jpg';
+import { MOBILE_MONEY_PAYBILLS, PAYMENT_ACCOUNT_NAME } from '@/data/paymentDetails';
 
 const tiers = [
   { title: 'Individual', price: 'Tsh 250,000', text: 'One seat at the awards dinner and ceremony.' },
@@ -43,7 +44,15 @@ export default function GalaRegistration() {
                 ))}
               </dl>
               <h2 className="mt-10 text-xs font-semibold uppercase tracking-[0.18em] text-ink">Payment</h2>
-              <p className="mt-3 text-sm leading-relaxed text-ink-muted">Pay by bank transfer or mobile money. Our team confirms your registration and shares payment details by email.</p>
+              <p className="mt-3 text-sm leading-relaxed text-ink-muted">Pay by mobile money (Pay Bill) to <span className="font-semibold text-ink">{PAYMENT_ACCOUNT_NAME}</span>, or by bank transfer. Our team confirms your registration by email.</p>
+              <dl className="mt-4 divide-y divide-stone border-y border-stone">
+                {MOBILE_MONEY_PAYBILLS.map((m) => (
+                  <div key={m.network} className="flex items-baseline justify-between gap-4 py-3">
+                    <dt className="text-sm font-semibold text-ink">{m.network}</dt>
+                    <dd className="font-display text-lg font-semibold text-navy">{m.number}</dd>
+                  </div>
+                ))}
+              </dl>
               <p className="mt-6 text-sm leading-relaxed text-ink-muted">Questions? <a href="mailto:ibb@impactadvisory.co.tz" className="font-semibold text-navy">ibb@impactadvisory.co.tz</a></p>
             </Reveal>
           </div>
