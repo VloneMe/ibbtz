@@ -19,7 +19,7 @@ const inputClass = (hasError: boolean) =>
   `field ${hasError ? 'border-red-500' : ''}`;
 
 const SUGGESTED_AMOUNT: Record<(typeof REGISTRATION_TYPES)[number], (typeof AMOUNTS)[number]> = {
-  'Individual': 'Tsh 250,000',
+  'Individual': 'Tsh 150,000',
   'Corporate Table': 'Tsh 2,000,000',
 };
 

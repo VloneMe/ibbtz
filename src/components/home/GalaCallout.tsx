@@ -22,7 +22,7 @@ const GalaCallout = () => (
         <dl className="divide-y divide-stone border-y border-stone self-center lg:col-span-5">
           <div className="flex items-baseline justify-between gap-4 py-5">
             <dt><span className="block font-semibold text-ink">Individual</span><span className="text-sm text-ink-muted">One seat</span></dt>
-            <dd className="font-display text-2xl font-semibold text-navy">Tsh 250,000</dd>
+            <dd className="font-display text-2xl font-semibold text-navy">Tsh 150,000</dd>
           </div>
           <div className="flex items-baseline justify-between gap-4 py-5">
             <dt><span className="block font-semibold text-ink">Corporate table</span><span className="text-sm text-ink-muted">For your organisation</span></dt>

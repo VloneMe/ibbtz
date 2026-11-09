@@ -69,7 +69,7 @@ const deleteStmt = db.prepare(`DELETE FROM gala_registrations WHERE id = ?`);
 // ---------------------------------------------------------------------------
 export const REGISTRATION_TYPES = ['Individual', 'Corporate Table'];
 export const PAYMENT_METHODS = ['Bank transfer', 'Mobile Money'];
-export const AMOUNTS = ['Tsh 250,000', 'Tsh 2,000,000'];
+export const AMOUNTS = ['Tsh 150,000', 'Tsh 2,000,000'];
 
 const clean = (v, max = 200) => (typeof v === 'string' ? v.trim().slice(0, max) : '');
 

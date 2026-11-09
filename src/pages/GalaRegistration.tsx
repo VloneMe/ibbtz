@@ -6,7 +6,7 @@ import hero from '@/assets/photos/hero.jpg';
 import { MOBILE_MONEY_PAYBILLS, PAYMENT_ACCOUNT_NAME } from '@/data/paymentDetails';
 
 const tiers = [
-  { title: 'Individual', price: 'Tsh 250,000', text: 'One seat at the awards dinner and ceremony.' },
+  { title: 'Individual', price: 'Tsh 150,000', text: 'One seat at the awards dinner and ceremony.' },
   { title: 'Corporate table', price: 'Tsh 2,000,000', text: 'A full table for your organisation, with recognition on the night.' },
 ];
 

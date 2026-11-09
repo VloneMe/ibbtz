@@ -6,7 +6,7 @@ const TOKEN_KEY = 'ibbplus_admin_token';
 
 export const REGISTRATION_TYPES = ['Individual', 'Corporate Table'] as const;
 export const PAYMENT_METHODS = ['Bank transfer', 'Mobile Money'] as const;
-export const AMOUNTS = ['Tsh 250,000', 'Tsh 2,000,000'] as const;
+export const AMOUNTS = ['Tsh 150,000', 'Tsh 2,000,000'] as const;
 
 export const galaRegistrationSchema = z.object({
   fullName: z.string().trim().min(2, 'Full name is required').max(200),
