@@ -318,11 +318,11 @@ const mockMediaData: MediaItem[] = [
     id: '6',
     src: ibb6,
     url: ibb6,
-    title: "Networking Gala",
+    title: "Networking Evening",
     description: "Evening of connections and partnerships",
     category: "Networking",
     date: "2023-11-20",
-    alt: "Networking Gala"
+    alt: "Networking Evening"
   },
   {
     id: '7',
