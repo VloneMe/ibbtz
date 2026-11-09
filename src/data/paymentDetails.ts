@@ -1,4 +1,4 @@
-import mpesaLogo from '@/assets/payments/mpesa.svg';
+import mpesaLogo from '@/assets/payments/mpesa.png';
 import mixxLogo from '@/assets/payments/mixx-by-yas.svg';
 
 /** Where Impact Business Awards registration payments are made. */

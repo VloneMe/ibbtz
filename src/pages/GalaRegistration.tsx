@@ -49,7 +49,7 @@ export default function GalaRegistration() {
                 {MOBILE_MONEY_PAYBILLS.map((m) => (
                   <div key={m.network} className="flex items-center justify-between gap-4 py-3">
                     <dt className="flex items-center gap-3 text-sm font-semibold text-ink">
-                      <img src={m.logo} alt="" aria-hidden="true" className="h-7 w-16 object-contain object-left" />
+                      <img src={m.logo} alt="" aria-hidden="true" className="h-8 w-14 object-contain object-left" />
                       {m.network}
                     </dt>
                     <dd className="font-display text-lg font-semibold text-navy">{m.number}</dd>
