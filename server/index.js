@@ -68,7 +68,7 @@ const deleteStmt = db.prepare(`DELETE FROM gala_registrations WHERE id = ?`);
 // Form definition (mirrors the Google Form)
 // ---------------------------------------------------------------------------
 export const REGISTRATION_TYPES = ['Individual', 'Corporate Table'];
-export const PAYMENT_METHODS = ['Bank transfer', 'Mobile Money'];
+export const PAYMENT_METHODS = ['Mobile Money (Pay Bill)'];
 export const AMOUNTS = ['Tsh 150,000', 'Tsh 2,000,000'];
 
 const clean = (v, max = 200) => (typeof v === 'string' ? v.trim().slice(0, max) : '');
@@ -82,7 +82,7 @@ function validateRegistration(body) {
     organisation: clean(body.organisation),
     job_title: clean(body.jobTitle) || null,
     registration_type: clean(body.registrationType, 40),
-    payment_method: clean(body.paymentMethod, 40) || null,
+    payment_method: clean(body.paymentMethod, 40) || PAYMENT_METHODS[0],
     amount: clean(body.amount, 40) || null,
   };
   if (data.full_name.length < 2) errors.fullName = 'Full name is required';

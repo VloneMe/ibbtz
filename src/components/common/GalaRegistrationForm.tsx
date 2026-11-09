@@ -31,7 +31,7 @@ export default function GalaRegistrationForm({ className = '' }: { className?: s
   const { register, handleSubmit, control, setValue, setError: setFieldError, getValues, watch, formState: { errors } } =
     useForm<GalaRegistrationInput>({
       resolver: zodResolver(galaRegistrationSchema),
-      defaultValues: { fullName: '', email: '', phone: '', organisation: '', jobTitle: '', registrationType: undefined, paymentMethod: '', amount: '', interests: {}, interestsOther: '' },
+      defaultValues: { fullName: '', email: '', phone: '', organisation: '', jobTitle: '', registrationType: undefined, paymentMethod: PAYMENT_METHODS[0], amount: '', interests: {}, interestsOther: '' },
       mode: 'onSubmit',
     });
 
@@ -200,25 +200,6 @@ export default function GalaRegistrationForm({ className = '' }: { className?: s
           <legend className="text-gold font-semibold uppercase tracking-[0.18em] text-xs mb-2">Payment Details</legend>
           <div className="grid sm:grid-cols-2 gap-4">
             <div>
-              <Label htmlFor="gala-paymentMethod" className="field-label">Payment Method</Label>
-              <Controller
-                name="paymentMethod"
-                control={control}
-                render={({ field }) => (
-                  <Select onValueChange={field.onChange} value={field.value || ''}>
-                    <SelectTrigger id="gala-paymentMethod" className={inputClass(!!errors.paymentMethod)}>
-                      <SelectValue placeholder="Select payment method" />
-                    </SelectTrigger>
-                    <SelectContent className="bg-white border-stone text-ink">
-                      {PAYMENT_METHODS.map((m) => (
-                        <SelectItem key={m} value={m} className="focus:bg-sand">{m}</SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                )}
-              />
-            </div>
-            <div>
               <Label htmlFor="gala-amount" className="field-label">Amount</Label>
               <Controller
                 name="amount"
@@ -329,7 +310,7 @@ function PayBillDetails() {
           </div>
         ))}
       </dl>
-      <p className="mt-3 text-xs leading-relaxed text-ink-muted">Bank transfer details are shared by email once your registration is received.</p>
+      <p className="mt-3 text-xs leading-relaxed text-ink-muted">All payments are made through Pay Bill on either network. Keep your transaction message; our team confirms your registration by email.</p>
     </div>
   );
 }

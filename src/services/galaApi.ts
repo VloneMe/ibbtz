@@ -5,7 +5,7 @@ const API_BASE = import.meta.env.VITE_GALA_API_URL || '/api';
 const TOKEN_KEY = 'ibbplus_admin_token';
 
 export const REGISTRATION_TYPES = ['Individual', 'Corporate Table'] as const;
-export const PAYMENT_METHODS = ['Bank transfer', 'Mobile Money'] as const;
+export const PAYMENT_METHODS = ['Mobile Money (Pay Bill)'] as const;
 export const AMOUNTS = ['Tsh 150,000', 'Tsh 2,000,000'] as const;
 
 export const galaRegistrationSchema = z.object({

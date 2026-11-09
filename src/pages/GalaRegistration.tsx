@@ -44,7 +44,7 @@ export default function GalaRegistration() {
                 ))}
               </dl>
               <h2 className="mt-10 text-xs font-semibold uppercase tracking-[0.18em] text-ink">Payment</h2>
-              <p className="mt-3 text-sm leading-relaxed text-ink-muted">Pay by mobile money (Pay Bill) to <span className="font-semibold text-ink">{PAYMENT_ACCOUNT_NAME}</span>, or by bank transfer. Our team confirms your registration by email.</p>
+              <p className="mt-3 text-sm leading-relaxed text-ink-muted">All payments are made by mobile money Pay Bill to <span className="font-semibold text-ink">{PAYMENT_ACCOUNT_NAME}</span>. Our team confirms your registration by email.</p>
               <dl className="mt-4 divide-y divide-stone border-y border-stone">
                 {MOBILE_MONEY_PAYBILLS.map((m) => (
                   <div key={m.network} className="flex items-center justify-between gap-4 py-3">

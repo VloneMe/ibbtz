@@ -28,7 +28,7 @@ const GalaCallout = () => (
             <dt><span className="block font-semibold text-ink">Corporate table</span><span className="text-sm text-ink-muted">For your organisation</span></dt>
             <dd className="font-display text-2xl font-semibold text-navy">Tsh 2,000,000</dd>
           </div>
-          <p className="py-4 text-sm text-ink-muted">Payment by bank transfer or mobile money. Details follow registration.</p>
+          <p className="py-4 text-sm text-ink-muted">Payment by mobile money Pay Bill to Impact Advisory (T) Ltd. Numbers are shown on the registration form.</p>
         </dl>
       </Reveal>
     </Container>
