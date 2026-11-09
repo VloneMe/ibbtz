@@ -1,4 +1,4 @@
-import { createBrowserRouter } from 'react-router-dom'
+import { createBrowserRouter, Navigate } from 'react-router-dom'
 import RootLayout from '../components/layout/RootLayout'
 import Home from '../pages/Home'
 import About from '../pages/About'
@@ -45,8 +45,13 @@ export const router = createBrowserRouter([
         element: <Feedback />,
       },
       {
-        path: 'gala',
+        path: 'iba',
         element: <GalaRegistration />,
+      },
+      {
+        // Old link kept alive for anyone who already shared it
+        path: 'gala',
+        element: <Navigate to="/iba" replace />,
       },
       {
         path: 'admin',

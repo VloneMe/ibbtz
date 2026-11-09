@@ -11,7 +11,7 @@ const icons = { Facebook, Twitter, Linkedin, Instagram, Youtube } as const;
 const navigate = [
   { to: '/', label: 'Home' },
   { to: '/aboutus', label: 'About' },
-  { to: '/gala', label: 'Awards Gala' },
+  { to: '/iba', label: 'Impact Business Awards' },
   { to: '/contactus', label: 'Contact' },
   { to: '/feedback', label: 'Feedback' },
 ];

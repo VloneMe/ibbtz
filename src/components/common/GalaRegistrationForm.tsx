@@ -66,7 +66,7 @@ export default function GalaRegistrationForm({ className = '' }: { className?: s
           <p className="text-lg text-ink-muted mb-6 max-w-2xl mx-auto leading-relaxed">
             Thank you for registering for the Impact Business Awards Gala. Our team will be in touch with payment and event details.
           </p>
-          <p className="text-sm text-green-700">Reference: IBB-GALA-{String(submittedId).padStart(4, '0')}</p>
+          <p className="text-sm text-green-700">Reference: IBA-{String(submittedId).padStart(4, '0')}</p>
         </motion.div>
       </div>
     );

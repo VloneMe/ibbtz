@@ -6,7 +6,7 @@ import { Logo } from './Logo';
 const links = [
   { to: '/', label: 'Home' },
   { to: '/aboutus', label: 'About' },
-  { to: '/gala', label: 'Awards Gala' },
+  { to: '/iba', label: 'Impact Business Awards' },
   { to: '/contactus', label: 'Contact' },
 ];
 
@@ -48,7 +48,7 @@ const Navigation = () => {
 
         <div className="hidden items-center gap-3 lg:flex">
           <Link to="/feedback" className="btn-outline px-5 py-2.5">Feedback</Link>
-          <Link to="/gala" className="btn-primary px-5 py-2.5">Register for the Gala</Link>
+          <Link to="/iba" className="btn-primary px-5 py-2.5">Register for IBA</Link>
         </div>
 
         <button type="button" onClick={() => setOpen((v) => !v)} className="-mr-2 rounded-sm p-2 text-navy lg:hidden" aria-expanded={open} aria-controls="mobile-nav" aria-label={open ? 'Close menu' : 'Open menu'}>
@@ -67,7 +67,7 @@ const Navigation = () => {
             <a href="https://impactadvisory.co.tz" target="_blank" rel="noopener noreferrer" className="border-b border-stone/70 py-3.5 text-base font-semibold text-ink">Impact Advisory</a>
             <div className="mt-4 grid grid-cols-2 gap-3">
               <Link to="/feedback" className="btn-outline">Feedback</Link>
-              <Link to="/gala" className="btn-primary">Register</Link>
+              <Link to="/iba" className="btn-primary">Register</Link>
             </div>
           </nav>
         </div>

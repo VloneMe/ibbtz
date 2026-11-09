@@ -10,7 +10,7 @@ const tiers = [
 ];
 
 export default function GalaRegistration() {
-  useEffect(() => { document.title = 'Register | Impact Business Awards Gala | IBB+ Tanzania'; }, []);
+  useEffect(() => { document.title = 'Register | Impact Business Awards (IBA) | IBB+ Tanzania'; }, []);
   return (
     <>
       <section className="relative isolate overflow-hidden bg-navy-deep text-white">

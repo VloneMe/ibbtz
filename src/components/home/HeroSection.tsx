@@ -25,8 +25,8 @@ const HeroSection = ({ onBecomeSponsor }: { onBecomeSponsor: () => void }) => (
         A convening platform for executives, policy makers and entrepreneurs: high-level sessions, candid debate and the partnerships that turn ideas into growth.
       </p>
       <div className="mt-10 flex flex-col gap-3 sm:flex-row sm:items-center">
-        <Link to="/gala" className="btn-gold">
-          Register for the Awards Gala <ArrowRight className="h-4 w-4" />
+        <Link to="/iba" className="btn-gold">
+          Register for the Impact Business Awards <ArrowRight className="h-4 w-4" />
         </Link>
         <button type="button" onClick={onBecomeSponsor} className="btn-outline-light">Become a sponsor</button>
       </div>

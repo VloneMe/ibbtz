@@ -15,7 +15,7 @@ const GalaCallout = () => (
           <p className="mt-5 text-lg leading-relaxed text-ink-muted">
             Join fellow leaders for the Impact Business Awards Gala. Register as an individual or reserve a corporate table for your organisation.
           </p>
-          <Link to="/gala" className="btn-primary mt-8">
+          <Link to="/iba" className="btn-primary mt-8">
             Register now <ArrowRight className="h-4 w-4" />
           </Link>
         </div>

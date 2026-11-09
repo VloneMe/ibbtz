@@ -108,7 +108,7 @@ export default function About() {
               <p className="mt-5 max-w-xl text-lg leading-relaxed text-white/80">Connect with industry leaders, share knowledge, and help build a knowledge-driven economy for Vision 2050.</p>
             </div>
             <div className="flex flex-col gap-3 sm:flex-row lg:col-span-5 lg:justify-end">
-              <Link to="/gala" className="btn-gold">Register for the Gala <ArrowRight className="h-4 w-4" /></Link>
+              <Link to="/iba" className="btn-gold">Register for IBA <ArrowRight className="h-4 w-4" /></Link>
               <Link to="/contactus" className="btn-outline-light">Get in touch</Link>
             </div>
           </Reveal>
