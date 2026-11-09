@@ -5,7 +5,7 @@ import GalaRegistrationForm from '@/components/common/GalaRegistrationForm';
 import hero from '@/assets/photos/hero.jpg';
 
 const tiers = [
-  { title: 'Individual', price: 'Tsh 250,000', text: 'One seat at the gala dinner and awards ceremony.' },
+  { title: 'Individual', price: 'Tsh 250,000', text: 'One seat at the awards dinner and ceremony.' },
   { title: 'Corporate table', price: 'Tsh 2,000,000', text: 'A full table for your organisation, with recognition on the night.' },
 ];
 
@@ -18,7 +18,7 @@ export default function GalaRegistration() {
         <div className="absolute inset-0 bg-gradient-to-b from-navy-deep/70 via-navy-deep/85 to-navy-deep" />
         <Container className="relative py-16 sm:py-24">
           <p className="eyebrow text-gold-soft">Impact Business Awards</p>
-          <h1 className="mt-5 max-w-3xl font-display text-4xl font-semibold leading-[1.1] sm:text-5xl">Impact Business Awards Gala</h1>
+          <h1 className="mt-5 max-w-3xl font-display text-4xl font-semibold leading-[1.1] sm:text-5xl">Impact Business Awards 2026</h1>
           <p className="mt-5 max-w-2xl text-lg leading-relaxed text-white/80 sm:text-xl">Reserve your seat at the evening celebrating Tanzania's impact-driven businesses and leaders. Register as an individual or book a corporate table.</p>
         </Container>
       </section>

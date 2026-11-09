@@ -8,12 +8,12 @@ const GalaCallout = () => (
     <Container>
       <Reveal className="grid gap-10 rounded-sm border border-gold/50 bg-white p-7 sm:p-10 lg:grid-cols-12 lg:gap-16 lg:p-14">
         <div className="lg:col-span-7">
-          <p className="eyebrow">Impact Business Awards Gala</p>
+          <p className="eyebrow">Impact Business Awards (IBA)</p>
           <h2 id="gala-title" className="mt-5 font-display text-3xl font-semibold leading-tight text-navy sm:text-4xl">
             An evening to celebrate the businesses shaping Tanzania's future.
           </h2>
           <p className="mt-5 text-lg leading-relaxed text-ink-muted">
-            Join fellow leaders for the Impact Business Awards Gala. Register as an individual or reserve a corporate table for your organisation.
+            Join fellow leaders at the Impact Business Awards 2026. Register as an individual or reserve a corporate table for your organisation.
           </p>
           <Link to="/iba" className="btn-primary mt-8">
             Register now <ArrowRight className="h-4 w-4" />

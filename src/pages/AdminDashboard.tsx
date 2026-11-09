@@ -30,7 +30,7 @@ function LoginCard({ onSuccess }: { onSuccess: () => void }) {
       <div className="flex items-center gap-3 mb-6">
         <div className="w-12 h-12 bg-navy rounded-full flex items-center justify-center"><Lock className="h-6 w-6 text-white" /></div>
         <div>
-          <h1 className="font-display text-2xl font-semibold text-navy">Gala Dashboard</h1>
+          <h1 className="font-display text-2xl font-semibold text-navy">IBA Dashboard</h1>
           <p className="text-sm text-ink-muted">Enter the admin password to continue.</p>
         </div>
       </div>
@@ -78,7 +78,7 @@ export default function AdminDashboard() {
   const [expanded, setExpanded] = useState<number | null>(null);
   const [showInterests, setShowInterests] = useState(false);
 
-  useEffect(() => { document.title = 'Gala Registrations | Admin | IBB+'; }, []);
+  useEffect(() => { document.title = 'IBA Registrations | Admin | IBB+'; }, []);
 
   const load = useCallback(async () => {
     setLoading(true); setError(null);
@@ -124,8 +124,8 @@ export default function AdminDashboard() {
       <Container className="py-12 px-4">
         <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="flex flex-wrap items-center justify-between gap-4 mb-8">
           <div>
-            <h1 className="font-display text-3xl font-semibold text-navy">Gala Registrations</h1>
-            <p className="text-ink-muted text-sm">Impact Business Awards Gala sign-ups submitted on ibbplus.com</p>
+            <h1 className="font-display text-3xl font-semibold text-navy">IBA Registrations</h1>
+            <p className="text-ink-muted text-sm">Impact Business Awards sign-ups submitted on ibbplus.com</p>
           </div>
           <div className="flex gap-2">
             <Button variant="outline" onClick={load} disabled={loading} className="btn-outline">

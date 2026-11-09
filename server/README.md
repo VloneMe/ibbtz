@@ -1,6 +1,6 @@
 # ibbplus-api
 
-Small Express + SQLite API behind the gala registration form on ibbplus.com.
+Small Express + SQLite API behind the Impact Business Awards (IBA) registration form on ibbplus.com.
 
 ## Endpoints
 

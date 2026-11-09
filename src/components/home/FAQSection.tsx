@@ -6,8 +6,8 @@ import Reveal from '@/components/common/Reveal';
 
 const faqs = [
   { q: 'What is the Impact Business Breakfast?', a: "A networking and knowledge-sharing platform that brings together industry leaders, entrepreneurs, government officials and professionals to discuss the issues affecting Tanzania's economic development." },
-  { q: 'How do I register?', a: 'Registration for the Impact Business Awards Gala is open on this site. For the breakfast editions, use the contact page and our team will reach you with the next date and registration details.' },
-  { q: 'What does attendance cost?', a: 'Breakfast editions: individual seats are TZS 120,000 and corporate tables TZS 1,500,000. The Awards Gala: individual Tsh 250,000 and corporate table Tsh 2,000,000.' },
+  { q: 'How do I register?', a: 'Registration for the Impact Business Awards (IBA) is open on this site. For the breakfast editions, use the contact page and our team will reach you with the next date and registration details.' },
+  { q: 'What does attendance cost?', a: 'Breakfast editions: individual seats are TZS 120,000 and corporate tables TZS 1,500,000. The Impact Business Awards: individual Tsh 250,000 and corporate table Tsh 2,000,000.' },
   { q: 'Who can attend?', a: "Business leaders, government officials, entrepreneurs, academics and professionals with an interest in Tanzania's economic development and human capital growth." },
   { q: 'Is there time for networking?', a: 'Yes. Every edition includes dedicated networking time, breaks and interactive discussion designed for meaningful introductions.' },
 ];
