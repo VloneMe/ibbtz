@@ -13,10 +13,10 @@ export default defineConfig({
   },
   build: {
     rollupOptions: {
-      // Second HTML entry so /iba gets its own link-preview metadata (nginx serves iba.html for /iba)
+      // Second HTML entry so /award gets its own link-preview metadata (nginx serves award.html for /award)
       input: {
         main: path.resolve(__dirname, 'index.html'),
-        iba: path.resolve(__dirname, 'iba.html'),
+        award: path.resolve(__dirname, 'award.html'),
       },
     },
   },

@@ -45,11 +45,6 @@ export const router = createBrowserRouter([
         element: <Feedback />,
       },
       {
-        path: 'iba',
-        element: <GalaRegistration />,
-      },
-      {
-        // Short alias for the same registration page
         path: 'award',
         element: <GalaRegistration />,
       },
