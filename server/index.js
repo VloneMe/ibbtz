@@ -75,6 +75,7 @@ const deleteStmt = db.prepare(`DELETE FROM gala_registrations WHERE id = ?`);
 export const REGISTRATION_TYPES = ['Individual', 'Corporate Table'];
 export const PAYMENT_METHODS = ['Mobile Money (Pay Bill)'];
 export const AMOUNTS = ['Tsh 150,000', 'Tsh 2,000,000'];
+const AMOUNT_BY_TYPE = { 'Individual': 'Tsh 150,000', 'Corporate Table': 'Tsh 2,000,000' };
 
 const clean = (v, max = 200) => (typeof v === 'string' ? v.trim().slice(0, max) : '');
 
@@ -96,6 +97,8 @@ function validateRegistration(body) {
   if (data.organisation.length < 2) errors.organisation = 'Organisation / company is required';
   if (!REGISTRATION_TYPES.includes(data.registration_type)) errors.registrationType = 'Please choose a registration type';
   if (data.payment_method && !PAYMENT_METHODS.includes(data.payment_method)) errors.paymentMethod = 'Invalid payment method';
+  // The price is fixed by the registration type, so never store a mismatched amount.
+  if (AMOUNT_BY_TYPE[data.registration_type]) data.amount = AMOUNT_BY_TYPE[data.registration_type];
   if (data.amount && !AMOUNTS.includes(data.amount)) errors.amount = 'Invalid amount';
 
   // Career, business and leadership interests (optional; validated against the question list)

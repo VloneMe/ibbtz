@@ -28,7 +28,7 @@ export default function GalaRegistrationForm({ className = '' }: { className?: s
   const [error, setError] = useState<string | null>(null);
   const [submittedId, setSubmittedId] = useState<number | null>(null);
 
-  const { register, handleSubmit, control, setValue, setError: setFieldError, getValues, watch, formState: { errors } } =
+  const { register, handleSubmit, control, setValue, setError: setFieldError, watch, formState: { errors } } =
     useForm<GalaRegistrationInput>({
       resolver: zodResolver(galaRegistrationSchema),
       defaultValues: { fullName: '', email: '', phone: '', organisation: '', jobTitle: '', registrationType: undefined, paymentMethod: PAYMENT_METHODS[0], amount: '', interests: {}, interestsOther: '' },
@@ -151,7 +151,7 @@ export default function GalaRegistrationForm({ className = '' }: { className?: s
                       aria-checked={selected}
                       onClick={() => {
                         field.onChange(type);
-                        if (!getValues('amount')) setValue('amount', SUGGESTED_AMOUNT[type]);
+                        setValue('amount', SUGGESTED_AMOUNT[type], { shouldValidate: true });
                       }}
                       className={`flex items-center gap-4 p-4 rounded-lg border-2 text-left transition-colors ${
                         selected ? 'border-navy bg-navy/5' : 'border-stone bg-white hover:border-navy/50'
