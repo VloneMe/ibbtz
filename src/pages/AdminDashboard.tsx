@@ -4,7 +4,7 @@ import { Container } from '../common/Container';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Lock, LogOut, RefreshCw, Download, Search, Trash2, Loader2, Users, User, Building2, Wallet, CalendarClock, AlertCircle } from 'lucide-react';
+import { Lock, LogOut, RefreshCw, Download, Search, Trash2, Loader2, Users, User, Building2, Wallet, CalendarClock, AlertCircle, Mail, MailCheck, MailX, CheckCircle2 } from 'lucide-react';
 import { adminApi, adminAuth, ApiError, type GalaRegistration, type GalaStats } from '@/services/galaApi';
 import { GALA_QUESTIONS, OTHER, parseInterests } from '@/data/galaQuestions';
 import { ChevronDown, ChevronUp } from 'lucide-react';
@@ -77,6 +77,9 @@ export default function AdminDashboard() {
   const [pendingDelete, setPendingDelete] = useState<number | null>(null);
   const [expanded, setExpanded] = useState<number | null>(null);
   const [showInterests, setShowInterests] = useState(false);
+  const [pendingEmail, setPendingEmail] = useState<number | null>(null);
+  const [sendingEmail, setSendingEmail] = useState<number | null>(null);
+  const [notice, setNotice] = useState<string | null>(null);
 
   useEffect(() => { document.title = 'IBA Registrations | Admin | IBB+'; }, []);
 
@@ -99,6 +102,19 @@ export default function AdminDashboard() {
   const remove = async (id: number) => {
     try { await adminApi.remove(id); setPendingDelete(null); await load(); }
     catch (err) { setError((err as ApiError).message); }
+  };
+
+  const sendEmail = async (id: number) => {
+    setSendingEmail(id); setPendingEmail(null); setError(null); setNotice(null);
+    try {
+      const res = await adminApi.sendEmail(id);
+      setRows((prev) => prev.map((r) => (r.id === id ? res.data : r)));
+      setNotice(res.message);
+    } catch (err) {
+      const e = err as ApiError;
+      if (e.status === 401) setSignedIn(false);
+      else { setError(e.message); await load(); }
+    } finally { setSendingEmail(null); }
   };
 
   const filtered = useMemo(() => {
@@ -138,6 +154,9 @@ export default function AdminDashboard() {
           </div>
         </motion.div>
 
+        {notice && (
+          <div className="mb-6 p-4 bg-green-50 border border-green-200 rounded-lg flex items-center gap-2 text-green-700"><CheckCircle2 className="h-5 w-5" />{notice}</div>
+        )}
         {error && (
           <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg flex items-center gap-2 text-red-600"><AlertCircle className="h-5 w-5" />{error}</div>
         )}
@@ -218,17 +237,17 @@ export default function AdminDashboard() {
             <table className="w-full text-sm">
               <thead className="text-left text-ink-muted bg-sand/60">
                 <tr>
-                  {['#', 'Submitted', 'Name', 'Contact', 'Organisation', 'Type', 'Payment', 'Amount', ''].map((h) => (
+                  {['#', 'Submitted', 'Name', 'Contact', 'Organisation', 'Type', 'Payment', 'Amount', 'Email', ''].map((h) => (
                     <th key={h} className="px-4 py-3 font-semibold whitespace-nowrap">{h}</th>
                   ))}
                 </tr>
               </thead>
               <tbody>
                 {loading && rows.length === 0 && (
-                  <tr><td colSpan={9} className="px-4 py-10 text-center text-ink-muted"><Loader2 className="h-5 w-5 animate-spin inline mr-2" />Loading...</td></tr>
+                  <tr><td colSpan={10} className="px-4 py-10 text-center text-ink-muted"><Loader2 className="h-5 w-5 animate-spin inline mr-2" />Loading...</td></tr>
                 )}
                 {!loading && filtered.length === 0 && (
-                  <tr><td colSpan={9} className="px-4 py-10 text-center text-ink-muted">{rows.length ? 'No registrations match your search.' : 'No registrations yet.'}</td></tr>
+                  <tr><td colSpan={10} className="px-4 py-10 text-center text-ink-muted">{rows.length ? 'No registrations match your search.' : 'No registrations yet.'}</td></tr>
                 )}
                 {filtered.map((r) => {
                   const { answers, other } = parseInterests(r.interests);
@@ -260,6 +279,24 @@ export default function AdminDashboard() {
                     <td className="px-4 py-3 text-ink-muted whitespace-nowrap">{r.payment_method || '—'}</td>
                     <td className="px-4 py-3 text-ink-muted whitespace-nowrap">{r.amount || '—'}</td>
                     <td className="px-4 py-3 whitespace-nowrap">
+                      <EmailStatus row={r} />
+                      <div className="mt-1.5">
+                        {sendingEmail === r.id ? (
+                          <span className="inline-flex items-center gap-1 text-xs text-ink-muted"><Loader2 className="h-3.5 w-3.5 animate-spin" />Sending…</span>
+                        ) : pendingEmail === r.id ? (
+                          <span className="flex gap-1">
+                            <button onClick={() => sendEmail(r.id)} className="px-2 py-1 rounded bg-navy hover:bg-navy-soft text-white text-xs">Confirm send</button>
+                            <button onClick={() => setPendingEmail(null)} className="px-2 py-1 rounded bg-sand hover:bg-stone text-xs">Cancel</button>
+                          </span>
+                        ) : (
+                          <button onClick={() => { setPendingEmail(r.id); setNotice(null); }} disabled={sendingEmail !== null}
+                            className="inline-flex items-center gap-1 px-2 py-1 rounded border border-stone text-xs font-semibold text-navy hover:bg-sand disabled:opacity-50">
+                            <Mail className="h-3.5 w-3.5" />{r.email_status === 'sent' ? 'Resend' : 'Send email'}
+                          </button>
+                        )}
+                      </div>
+                    </td>
+                    <td className="px-4 py-3 whitespace-nowrap">
                       {pendingDelete === r.id ? (
                         <span className="flex gap-1">
                           <button onClick={() => remove(r.id)} className="px-2 py-1 rounded bg-red-600 hover:bg-red-500 text-white text-xs">Confirm</button>
@@ -274,7 +311,7 @@ export default function AdminDashboard() {
                   </tr>
                   {isOpen && (
                     <tr className="bg-sand/30">
-                      <td colSpan={9} className="px-6 py-5">
+                      <td colSpan={10} className="px-6 py-5">
                         {answered === 0 ? (
                           <p className="text-sm text-ink-muted">This registrant did not answer the interest questions.</p>
                         ) : (
@@ -299,5 +336,28 @@ export default function AdminDashboard() {
         </div>
       </Container>
     </main>
+  );
+}
+
+function EmailStatus({ row }: { row: GalaRegistration }) {
+  if (row.email_status === 'sent') {
+    return (
+      <span className="inline-flex items-center gap-1 rounded bg-green-50 px-2 py-1 text-xs font-semibold text-green-700"
+        title={row.email_sent_at ? `Sent ${fmtDate(row.email_sent_at)}` : 'Sent'}>
+        <MailCheck className="h-3.5 w-3.5" />Sent{row.email_sent_at ? ` · ${new Date(row.email_sent_at).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', timeZone: 'Africa/Dar_es_Salaam' })}` : ''}
+      </span>
+    );
+  }
+  if (row.email_status?.startsWith('failed')) {
+    return (
+      <span className="inline-flex items-center gap-1 rounded bg-red-50 px-2 py-1 text-xs font-semibold text-red-700" title={row.email_status}>
+        <MailX className="h-3.5 w-3.5" />Failed
+      </span>
+    );
+  }
+  return (
+    <span className="inline-flex items-center gap-1 rounded bg-sand px-2 py-1 text-xs font-semibold text-ink-muted">
+      <Mail className="h-3.5 w-3.5" />Not sent
+    </span>
   );
 }

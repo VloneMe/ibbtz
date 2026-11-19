@@ -182,7 +182,7 @@ export function buildConfirmationEmail(reg) {
 }
 
 /** Sends the confirmation email. Returns { ok, id?, error? }; never throws. */
-export async function sendConfirmationEmail(reg) {
+export async function sendConfirmationEmail(reg, { idempotencyKey } = {}) {
   const apiKey = process.env.RESEND_API_KEY;
   const from = process.env.EMAIL_FROM;
   if (!apiKey || !from) return { ok: false, error: 'Email not configured' };
@@ -193,7 +193,7 @@ export async function sendConfirmationEmail(reg) {
       headers: {
         Authorization: `Bearer ${apiKey}`,
         'Content-Type': 'application/json',
-        'Idempotency-Key': `iba-registration-${reg.id}`,
+        'Idempotency-Key': idempotencyKey || `iba-registration-${reg.id}`,
       },
       body: JSON.stringify({
         from,

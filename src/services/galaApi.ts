@@ -33,6 +33,8 @@ export interface GalaRegistration {
   payment_method: string | null;
   amount: string | null;
   interests: string | null;
+  email_status: string | null;
+  email_sent_at: string | null;
   created_at: string;
 }
 
@@ -101,5 +103,7 @@ export const adminAuth = {
 export const adminApi = {
   list: () => request<{ success: true; stats: GalaStats; data: GalaRegistration[] }>('/admin/registrations', {}, true),
   remove: (id: number) => request<{ success: true }>(`/admin/registrations/${id}`, { method: 'DELETE' }, true),
+  sendEmail: (id: number) =>
+    request<{ success: true; message: string; data: GalaRegistration }>(`/admin/registrations/${id}/email`, { method: 'POST' }, true),
   csvUrl: () => `${API_BASE}/admin/registrations.csv?token=${encodeURIComponent(adminAuth.getToken() || '')}`,
 };

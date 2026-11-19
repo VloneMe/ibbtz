@@ -58,6 +58,7 @@ const columns = db.prepare(`PRAGMA table_info(gala_registrations)`).all().map((c
 if (!columns.includes('interests')) db.exec(`ALTER TABLE gala_registrations ADD COLUMN interests TEXT`);
 // Confirmation email outcome: 'sent', 'failed: <reason>', or NULL for rows before emails existed.
 if (!columns.includes('email_status')) db.exec(`ALTER TABLE gala_registrations ADD COLUMN email_status TEXT`);
+if (!columns.includes('email_sent_at')) db.exec(`ALTER TABLE gala_registrations ADD COLUMN email_sent_at TEXT`);
 
 const insertStmt = db.prepare(`
   INSERT INTO gala_registrations
@@ -65,7 +66,14 @@ const insertStmt = db.prepare(`
   VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
 `);
 const getStmt = db.prepare(`SELECT * FROM gala_registrations WHERE id = ?`);
-const emailStatusStmt = db.prepare(`UPDATE gala_registrations SET email_status = ? WHERE id = ?`);
+const emailStatusStmt = db.prepare(`UPDATE gala_registrations SET email_status = ?, email_sent_at = COALESCE(?, email_sent_at) WHERE id = ?`);
+/** Sends the confirmation email for a registration and records the outcome. */
+async function sendAndRecord(reg, options) {
+  const r = await sendConfirmationEmail(reg, options);
+  emailStatusStmt.run(r.ok ? 'sent' : `failed: ${r.error}`.slice(0, 300), r.ok ? new Date().toISOString() : null, reg.id);
+  console.log(`[email] registration #${reg.id} ${r.ok ? `sent (${r.id})` : `failed: ${r.error}`}`);
+  return r;
+}
 const listStmt = db.prepare(`SELECT * FROM gala_registrations ORDER BY created_at DESC, id DESC`);
 const deleteStmt = db.prepare(`DELETE FROM gala_registrations WHERE id = ?`);
 
@@ -195,10 +203,7 @@ app.post('/api/gala/registrations', rateLimit({ windowMs: 60_000, max: 10 }), (r
 
   // Send the confirmation after responding, so email problems never block a registration.
   const reg = getStmt.get(id);
-  sendConfirmationEmail(reg).then((r) => {
-    emailStatusStmt.run(r.ok ? 'sent' : `failed: ${r.error}`.slice(0, 300), id);
-    console.log(`[email] registration #${id} ${r.ok ? `sent (${r.id})` : `failed: ${r.error}`}`);
-  });
+  sendAndRecord(reg);
 });
 
 app.post('/api/admin/login', rateLimit({ windowMs: 15 * 60_000, max: 20 }), (req, res) => {
@@ -258,6 +263,20 @@ app.delete('/api/admin/registrations/:id', requireAdmin, (req, res) => {
   const { changes } = deleteStmt.run(id);
   if (!changes) return res.status(404).json({ success: false, message: 'Not found' });
   res.json({ success: true });
+});
+
+// Send (or resend) the confirmation email from the dashboard. The three working days
+// to pay are counted from today, so a resent email never shows a deadline in the past.
+app.post('/api/admin/registrations/:id/email', requireAdmin, rateLimit({ windowMs: 60_000, max: 20 }), async (req, res) => {
+  const id = Number(req.params.id);
+  if (!Number.isInteger(id)) return res.status(400).json({ success: false, message: 'Invalid id' });
+  const reg = getStmt.get(id);
+  if (!reg) return res.status(404).json({ success: false, message: 'Not found' });
+  const r = await sendAndRecord({ ...reg, created_at: new Date().toISOString() },
+    { idempotencyKey: `iba-registration-${id}-manual-${Date.now()}` });
+  const row = getStmt.get(id);
+  if (!r.ok) return res.status(502).json({ success: false, message: `Email not sent: ${r.error}`, data: row });
+  res.json({ success: true, message: `Email sent to ${reg.email}`, data: row });
 });
 
 app.use('/api', (_req, res) => res.status(404).json({ success: false, message: 'Not found' }));
