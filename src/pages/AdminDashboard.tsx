@@ -237,17 +237,17 @@ export default function AdminDashboard() {
             <table className="w-full text-sm">
               <thead className="text-left text-ink-muted bg-sand/60">
                 <tr>
-                  {['#', 'Submitted', 'Name', 'Contact', 'Organisation', 'Type', 'Payment', 'Amount', 'Email', ''].map((h) => (
+                  {['#', 'Submitted', 'Name', 'Contact', 'Organisation', 'Type', 'Amount', 'Email', ''].map((h) => (
                     <th key={h} className="px-4 py-3 font-semibold whitespace-nowrap">{h}</th>
                   ))}
                 </tr>
               </thead>
               <tbody>
                 {loading && rows.length === 0 && (
-                  <tr><td colSpan={10} className="px-4 py-10 text-center text-ink-muted"><Loader2 className="h-5 w-5 animate-spin inline mr-2" />Loading...</td></tr>
+                  <tr><td colSpan={9} className="px-4 py-10 text-center text-ink-muted"><Loader2 className="h-5 w-5 animate-spin inline mr-2" />Loading...</td></tr>
                 )}
                 {!loading && filtered.length === 0 && (
-                  <tr><td colSpan={10} className="px-4 py-10 text-center text-ink-muted">{rows.length ? 'No registrations match your search.' : 'No registrations yet.'}</td></tr>
+                  <tr><td colSpan={9} className="px-4 py-10 text-center text-ink-muted">{rows.length ? 'No registrations match your search.' : 'No registrations yet.'}</td></tr>
                 )}
                 {filtered.map((r) => {
                   const { answers, other } = parseInterests(r.interests);
@@ -276,7 +276,6 @@ export default function AdminDashboard() {
                         {r.registration_type}
                       </span>
                     </td>
-                    <td className="px-4 py-3 text-ink-muted whitespace-nowrap">{r.payment_method || '—'}</td>
                     <td className="px-4 py-3 text-ink-muted whitespace-nowrap">{r.amount || '—'}</td>
                     <td className="px-4 py-3 whitespace-nowrap">
                       <EmailStatus row={r} />
@@ -311,7 +310,7 @@ export default function AdminDashboard() {
                   </tr>
                   {isOpen && (
                     <tr className="bg-sand/30">
-                      <td colSpan={10} className="px-6 py-5">
+                      <td colSpan={9} className="px-6 py-5">
                         {answered === 0 ? (
                           <p className="text-sm text-ink-muted">This registrant did not answer the interest questions.</p>
                         ) : (
