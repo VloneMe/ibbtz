@@ -49,7 +49,7 @@ export const router = createBrowserRouter([
         element: <GalaRegistration />,
       },
       // Earlier addresses of the registration page, kept so shared links still work
-      ...['gala', 'iba', 'ibb'].map((path) => ({ path, element: <Navigate to="/award" replace /> })),
+      ...['gala', 'iba'].map((path) => ({ path, element: <Navigate to="/award" replace /> })),
       {
         path: 'admin',
         element: <AdminDashboard />,
