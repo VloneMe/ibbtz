@@ -5,6 +5,7 @@ import { mkdirSync, existsSync, readFileSync } from 'node:fs';
 import { dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { GALA_QUESTIONS, OTHER } from './questions.js';
+import { sendConfirmationEmail } from './email.js';
 
 // ---------------------------------------------------------------------------
 // Config (loaded from ./.env if present, then process.env)
@@ -55,12 +56,16 @@ db.exec(`
 // Add the interests column to databases created before it existed.
 const columns = db.prepare(`PRAGMA table_info(gala_registrations)`).all().map((c) => c.name);
 if (!columns.includes('interests')) db.exec(`ALTER TABLE gala_registrations ADD COLUMN interests TEXT`);
+// Confirmation email outcome: 'sent', 'failed: <reason>', or NULL for rows before emails existed.
+if (!columns.includes('email_status')) db.exec(`ALTER TABLE gala_registrations ADD COLUMN email_status TEXT`);
 
 const insertStmt = db.prepare(`
   INSERT INTO gala_registrations
     (full_name, email, phone, organisation, job_title, registration_type, payment_method, amount, interests, ip, user_agent)
   VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
 `);
+const getStmt = db.prepare(`SELECT * FROM gala_registrations WHERE id = ?`);
+const emailStatusStmt = db.prepare(`UPDATE gala_registrations SET email_status = ? WHERE id = ?`);
 const listStmt = db.prepare(`SELECT * FROM gala_registrations ORDER BY created_at DESC, id DESC`);
 const deleteStmt = db.prepare(`DELETE FROM gala_registrations WHERE id = ?`);
 
@@ -184,6 +189,13 @@ app.post('/api/gala/registrations', rateLimit({ windowMs: 60_000, max: 10 }), (r
   const id = Number(result.lastInsertRowid);
   console.log(`[gala] registration #${id} ${data.email} (${data.registration_type})`);
   res.status(201).json({ success: true, message: 'Registration received', data: { id } });
+
+  // Send the confirmation after responding, so email problems never block a registration.
+  const reg = getStmt.get(id);
+  sendConfirmationEmail(reg).then((r) => {
+    emailStatusStmt.run(r.ok ? 'sent' : `failed: ${r.error}`.slice(0, 300), id);
+    console.log(`[email] registration #${id} ${r.ok ? `sent (${r.id})` : `failed: ${r.error}`}`);
+  });
 });
 
 app.post('/api/admin/login', rateLimit({ windowMs: 15 * 60_000, max: 20 }), (req, res) => {
