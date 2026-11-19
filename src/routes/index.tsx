@@ -1,4 +1,4 @@
-import { createBrowserRouter } from 'react-router-dom'
+import { createBrowserRouter, Navigate } from 'react-router-dom'
 import RootLayout from '../components/layout/RootLayout'
 import Home from '../pages/Home'
 import About from '../pages/About'
@@ -48,6 +48,8 @@ export const router = createBrowserRouter([
         path: 'award',
         element: <GalaRegistration />,
       },
+      // Earlier addresses of the registration page, kept so shared links still work
+      ...['gala', 'iba', 'ibb'].map((path) => ({ path, element: <Navigate to="/award" replace /> })),
       {
         path: 'admin',
         element: <AdminDashboard />,
