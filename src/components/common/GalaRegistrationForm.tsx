@@ -305,7 +305,7 @@ function PayBillDetails() {
             <img src={m.logo} alt={m.network} className="h-12 w-20 shrink-0 object-contain object-left" />
             <div className="min-w-0">
               <dt className="text-xs font-medium uppercase tracking-wide text-ink-muted">{m.network}</dt>
-              <dd className="mt-0.5 font-display text-xl font-semibold tracking-wide text-navy">{m.number}</dd>
+              <dd className="mt-0.5 font-sans font-bold tabular-nums tracking-normal text-xl text-navy">{m.number}</dd>
             </div>
           </div>
         ))}

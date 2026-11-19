@@ -78,7 +78,7 @@ export function buildConfirmationEmail(reg) {
   const paybillRows = PAYBILLS.map((p) => `
                     <tr>
                       <td style="padding:10px 0;font-size:14px;color:${ink};border-top:1px solid ${line};">${escapeHtml(p.network)} Pay Bill</td>
-                      <td align="right" style="padding:10px 0;font-size:20px;letter-spacing:1px;color:${navy};font-weight:700;border-top:1px solid ${line};font-family:Georgia,'Times New Roman',serif;">${escapeHtml(p.number)}</td>
+                      <td align="right" style="padding:10px 0;font-size:20px;letter-spacing:0.5px;color:${navy};font-weight:700;border-top:1px solid ${line};font-family:Helvetica,Arial,sans-serif;font-variant-numeric:tabular-nums;">${escapeHtml(p.number)}</td>
                     </tr>`).join('');
 
   const html = `<!DOCTYPE html>

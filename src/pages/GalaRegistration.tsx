@@ -37,7 +37,7 @@ export default function GalaRegistration() {
                   <div key={t.title} className="py-5">
                     <div className="flex items-baseline justify-between gap-4">
                       <dt className="font-semibold text-ink">{t.title}</dt>
-                      <dd className="font-display text-xl font-semibold text-navy">{t.price}</dd>
+                      <dd className="font-sans font-bold tabular-nums tracking-normal text-xl text-navy">{t.price}</dd>
                     </div>
                     <p className="mt-1 text-sm leading-relaxed text-ink-muted">{t.text}</p>
                   </div>
@@ -52,7 +52,7 @@ export default function GalaRegistration() {
                       <img src={m.logo} alt="" aria-hidden="true" className="h-8 w-14 object-contain object-left" />
                       {m.network}
                     </dt>
-                    <dd className="font-display text-lg font-semibold text-navy">{m.number}</dd>
+                    <dd className="font-sans font-bold tabular-nums tracking-normal text-lg text-navy">{m.number}</dd>
                   </div>
                 ))}
               </dl>

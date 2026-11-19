@@ -60,7 +60,9 @@ function StatCard({ icon: Icon, label, value, sub }: { icon: ElementType; label:
         <div className="w-9 h-9 bg-sand rounded-full flex items-center justify-center"><Icon className="h-4 w-4 text-navy" /></div>
         <span className="text-sm text-ink-muted">{label}</span>
       </div>
-      <div className="font-display text-3xl font-semibold text-navy">{value}</div>
+      <div className={typeof value === 'number'
+        ? 'font-display text-3xl font-semibold tabular-nums text-navy'
+        : 'font-sans text-xl font-bold leading-snug tabular-nums text-navy'}>{value}</div>
       {sub && <div className="text-xs text-ink-muted mt-1">{sub}</div>}
     </div>
   );
