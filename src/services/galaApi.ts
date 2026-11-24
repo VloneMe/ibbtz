@@ -40,6 +40,8 @@ export interface GalaRegistration {
   paid_at: string | null;
   invite_status: string | null;
   invite_sent_at: string | null;
+  rsvp_status: 'attending' | 'declined' | null;
+  rsvp_at: string | null;
   created_at: string;
 }
 
@@ -52,6 +54,8 @@ export interface GalaStats {
   last7Days: number;
   paid: number;
   receivedTsh: number;
+  attending: number;
+  declined: number;
   byQuestion: Record<string, Record<string, number>>;
 }
 

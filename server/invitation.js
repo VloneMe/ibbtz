@@ -35,12 +35,29 @@ export const qrPng = (token) => QRCode.toBuffer(inviteUrl(token), {
   type: 'png', width: 360, margin: 2, errorCorrectionLevel: 'M', color: { dark: '#17120e', light: '#ffffff' },
 });
 
+const RSVP_STATE = {
+  attending: 'Thank you. <strong>You have confirmed that you will attend.</strong> We look forward to welcoming you.',
+  declined: 'Thank you for letting us know. <strong>You have said you cannot attend.</strong> If your plans change, you can update your reply here.',
+  none: `Please let us know whether you will join us on ${EVENT.date}.`,
+};
+/** The RSVP section of the invitation page. A plain form, enhanced by the page script. */
+function rsvpBlock(reg) {
+  const status = reg.rsvp_status === 'attending' || reg.rsvp_status === 'declined' ? reg.rsvp_status : null;
+  const btn = (value, label, primary) => `<button class="rsvp-btn${!status && primary ? ' primary' : ''}" type="submit" name="response" value="${value}" aria-pressed="${status === value}">${label}</button>`;
+  return `<section class="rsvp" id="rsvp" aria-labelledby="rsvp-title"><b class="rsvp-title" id="rsvp-title">Kindly RSVP</b>`
+    + `<p class="rsvp-state" id="rsvp-state" aria-live="polite">${RSVP_STATE[status || 'none']}</p>`
+    + `<form class="rsvp-actions" id="rsvp-form" method="post" action="/invite/${encodeURIComponent(reg.invite_token)}/rsvp">`
+    + btn('attending', 'Yes, I will attend', true) + btn('declined', 'Sorry, I can\u2019t attend', false)
+    + `</form></section>`;
+}
+
 export async function buildInvitationPage(reg) {
   const values = {
     GUEST_NAME: escapeHtml(displayName(reg.full_name)),
     REFERENCE: escapeHtml(reference(reg)),
     ADMITS: escapeHtml(admits(reg)),
     QR_SVG: await qrSvg(reg.invite_token),
+    RSVP: rsvpBlock(reg),
   };
   return PAGE_TEMPLATE.replace(/\{\{([A-Z_]+)\}\}/g, (m, key) => values[key] ?? m);
 }
@@ -99,7 +116,7 @@ export function buildInvitationEmail(reg) {
             <td style="background:${cream};padding:34px 30px 30px;color:${ink};font-family:Georgia,'Times New Roman',serif;">
               <p style="margin:0 0 14px;font:16px/1.7 Georgia,'Times New Roman',serif;">Dear ${escapeHtml(firstName)},</p>
               <p style="margin:0 0 14px;font:14px/1.75 Arial,sans-serif;color:${muted};">Thank you. We have received your payment of <strong style="color:${ink};">${escapeHtml(reg.amount || '')}</strong> for reference <strong style="color:${ink};">${escapeHtml(ref)}</strong>, and your place at the <strong style="color:${ink};">${EVENT.name}</strong> is confirmed.</p>
-              <p style="margin:0 0 22px;font:14px/1.75 Arial,sans-serif;color:${muted};">It is our pleasure to invite you.</p>
+              <p style="margin:0 0 22px;font:14px/1.75 Arial,sans-serif;color:${muted};">It is our pleasure to invite you. Please open your invitation below and <strong style="color:${ink};">let us know whether you will attend</strong>.</p>
               <div style="height:1px;width:74px;background:#ad854a;margin:0 auto 22px;"></div>
               <p align="center" style="margin:0 auto 18px;max-width:420px;font:italic 20px/1.5 Georgia,'Times New Roman',serif;color:${ink};text-align:center;">&ldquo;${EVENT.statement}&rdquo;</p>
               <p align="center" style="margin:0 auto 22px;max-width:420px;font:13px/1.8 Arial,sans-serif;color:${muted};text-align:center;">${EVENT.description}</p>
@@ -121,7 +138,7 @@ export function buildInvitationEmail(reg) {
               <table role="presentation" align="center" cellpadding="0" cellspacing="0" style="margin:26px auto 4px;">
                 <tr>
                   <td align="center" style="background:#17120e;border:1px solid ${gold};">
-                    <a href="${url}" style="display:inline-block;padding:14px 26px;font:bold 11px Arial,sans-serif;letter-spacing:3px;text-transform:uppercase;color:#f0d9a5;text-decoration:none;">Open your invitation</a>
+                    <a href="${url}" style="display:inline-block;padding:14px 26px;font:bold 11px Arial,sans-serif;letter-spacing:3px;text-transform:uppercase;color:#f0d9a5;text-decoration:none;">Open invitation &amp; RSVP</a>
                   </td>
                 </tr>
               </table>
@@ -143,7 +160,7 @@ export function buildInvitationEmail(reg) {
   const text = [
     `Dear ${firstName},`,
     '',
-    `Thank you. We have received your payment of ${reg.amount || ''} for reference ${ref}, and your place at the ${EVENT.name} is confirmed. It is our pleasure to invite you.`,
+    `Thank you. We have received your payment of ${reg.amount || ''} for reference ${ref}, and your place at the ${EVENT.name} is confirmed. It is our pleasure to invite you. Please open your invitation and let us know whether you will attend.`,
     '',
     `${EVENT.theme.toUpperCase()} · IBA 2026`,
     `"${EVENT.statement}"`,
@@ -154,7 +171,7 @@ export function buildInvitationEmail(reg) {
     `Time: ${EVENT.time}`,
     `Venue: ${EVENT.venue}`,
     '',
-    `Your invitation and entry pass: ${url}`,
+    `Your invitation, RSVP and entry pass: ${url}`,
     `Present the QR code at the entrance. Admits ${admits(reg)}. Reference ${ref}.`,
     '',
     `Questions? ${CONTACT_EMAIL} or ${CONTACT_PHONE}`,

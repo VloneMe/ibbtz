@@ -73,7 +73,7 @@ if (!columns.includes('ref_no')) {
 }
 db.exec(`CREATE UNIQUE INDEX IF NOT EXISTS idx_gala_ref_no ON gala_registrations(ref_no)`);
 // Payment and invitation tracking.
-for (const [col, type] of [['paid_at', 'TEXT'], ['invite_token', 'TEXT'], ['invite_status', 'TEXT'], ['invite_sent_at', 'TEXT']]) {
+for (const [col, type] of [['paid_at', 'TEXT'], ['invite_token', 'TEXT'], ['invite_status', 'TEXT'], ['invite_sent_at', 'TEXT'], ['rsvp_status', 'TEXT'], ['rsvp_at', 'TEXT']]) {
   if (!columns.includes(col)) db.exec(`ALTER TABLE gala_registrations ADD COLUMN ${col} ${type}`);
 }
 db.exec(`CREATE UNIQUE INDEX IF NOT EXISTS idx_gala_invite_token ON gala_registrations(invite_token)`);
@@ -106,6 +106,8 @@ async function sendInvitationAndRecord(reg) {
   console.log(`[invite] registration #${reg.id} ${reg.reference} ${r.ok ? `sent (${r.id})` : `failed: ${r.error}`}`);
   return r;
 }
+const rsvpStmt = db.prepare(`UPDATE gala_registrations SET rsvp_status = ?, rsvp_at = ? WHERE id = ?`);
+const RSVP_RESPONSES = ['attending', 'declined'];
 const deleteStmt = db.prepare(`DELETE FROM gala_registrations WHERE id = ?`);
 
 // ---------------------------------------------------------------------------
@@ -212,6 +214,7 @@ const app = express();
 app.set('trust proxy', 'loopback');
 app.disable('x-powered-by');
 app.use(express.json({ limit: '32kb' }));
+app.use('/invite', express.urlencoded({ extended: false, limit: '2kb' }));
 
 app.get('/api/health', (_req, res) => res.json({ ok: true, service: 'ibbplus-api' }));
 
@@ -257,6 +260,8 @@ app.get('/api/admin/registrations', requireAdmin, (_req, res) => {
     expectedRevenueTsh: rows.reduce((sum, r) => sum + amountValue(r.amount), 0),
     paid: rows.filter((r) => r.paid_at).length,
     receivedTsh: rows.filter((r) => r.paid_at).reduce((sum, r) => sum + amountValue(r.amount), 0),
+    attending: rows.filter((r) => r.paid_at && r.rsvp_status === 'attending').length,
+    declined: rows.filter((r) => r.paid_at && r.rsvp_status === 'declined').length,
     last7Days: rows.filter((r) => Date.now() - Date.parse(r.created_at) < 7 * 86_400_000).length,
     byQuestion: Object.fromEntries(GALA_QUESTIONS.map((q) => [q.id, {}])),
   };
@@ -272,7 +277,7 @@ app.get('/api/admin/registrations', requireAdmin, (_req, res) => {
 
 app.get('/api/admin/registrations.csv', requireAdmin, (_req, res) => {
   const rows = listStmt.all();
-  const base = ['reference', 'legacy_reference', 'created_at', 'full_name', 'email', 'phone', 'organisation', 'job_title', 'registration_type', 'payment_method', 'amount', 'paid_at', 'invite_status', 'invite_sent_at'];
+  const base = ['reference', 'legacy_reference', 'created_at', 'full_name', 'email', 'phone', 'organisation', 'job_title', 'registration_type', 'payment_method', 'amount', 'paid_at', 'invite_status', 'invite_sent_at', 'rsvp_status', 'rsvp_at'];
   const qCols = GALA_QUESTIONS.map((q) => `q${q.number}_${q.id}`);
   const esc = (v) => { const s = v == null ? '' : String(v); return /[",\n]/.test(s) ? `"${s.replace(/"/g, '""')}"` : s; };
   const rowValues = (r) => {
@@ -348,6 +353,20 @@ app.get('/invite/:token', rateLimit({ windowMs: 60_000, max: 60 }), async (req, 
   const reg = activeInvite(req.params.token);
   if (!reg) return res.status(404).type('html').send(inactiveInvitationPage());
   res.type('html').send(await buildInvitationPage(reg));
+});
+// RSVP from the invitation page. Works as a plain form post (redirects back) or via fetch (JSON).
+app.post('/invite/:token/rsvp', rateLimit({ windowMs: 60_000, max: 20 }), (req, res) => {
+  res.set({ 'X-Robots-Tag': 'noindex, nofollow', 'Cache-Control': 'no-store' });
+  const wantsJson = req.is('application/json');
+  const reg = activeInvite(req.params.token);
+  if (!reg) return wantsJson ? res.status(404).json({ success: false, message: 'This invitation is not active' }) : res.status(404).type('html').send(inactiveInvitationPage());
+  const response = String(req.body?.response || '');
+  if (!RSVP_RESPONSES.includes(response)) return wantsJson ? res.status(400).json({ success: false, message: 'Invalid response' }) : res.redirect(303, `/invite/${reg.invite_token}`);
+  const at = new Date().toISOString();
+  rsvpStmt.run(response, at, reg.id);
+  console.log(`[rsvp] registration #${reg.id} ${reg.reference} ${response}`);
+  if (wantsJson) return res.json({ success: true, rsvp_status: response, rsvp_at: at });
+  res.redirect(303, `/invite/${reg.invite_token}?rsvp=${response}#rsvp`);
 });
 app.get('/invite/:token/qr.png', rateLimit({ windowMs: 60_000, max: 60 }), async (req, res) => {
   const reg = activeInvite(req.params.token);

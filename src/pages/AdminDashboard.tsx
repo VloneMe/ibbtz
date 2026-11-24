@@ -187,7 +187,7 @@ export default function AdminDashboard() {
             <StatCard icon={Building2} label="Corporate tables" value={types['Corporate Table'] || 0} />
             <StatCard icon={Wallet} label="Expected revenue" value={fmtTsh(stats.expectedRevenueTsh)} sub="Based on selected amounts" />
             <StatCard icon={BadgeCheck} label="Paid" value={`${stats.paid} of ${stats.total}`}
-              sub={`${fmtTsh(stats.receivedTsh)} received`} />
+              sub={`${fmtTsh(stats.receivedTsh)} received · RSVP: ${stats.attending} attending, ${stats.declined} declined`} />
           </div>
         )}
 
@@ -430,12 +430,18 @@ function PaymentStatus({ row }: { row: GalaRegistration }) {
     : row.invite_status?.startsWith('failed')
       ? { cls: 'text-red-700', text: 'Invitation failed' }
       : { cls: 'text-ink-muted', text: 'Invitation not sent' };
+  const rsvp = row.rsvp_status === 'attending'
+    ? { cls: 'text-green-700', text: 'RSVP: Attending' }
+    : row.rsvp_status === 'declined'
+      ? { cls: 'text-red-700', text: 'RSVP: Not attending' }
+      : { cls: 'text-ink-muted', text: 'RSVP: No reply yet' };
   return (
     <span className="flex flex-col items-start gap-0.5">
       <span className="inline-flex items-center gap-1 rounded bg-green-50 px-2 py-1 text-xs font-semibold text-green-700" title={`Marked paid ${fmtDate(row.paid_at)}`}>
         <BadgeCheck className="h-3.5 w-3.5" />Paid · {shortDate(row.paid_at)}
       </span>
       <span className={`text-[11px] font-medium ${invite.cls}`} title={row.invite_status || undefined}>{invite.text}</span>
+      <span className={`text-[11px] font-medium ${rsvp.cls}`} title={row.rsvp_at ? `Replied ${fmtDate(row.rsvp_at)}` : undefined}>{rsvp.text}</span>
     </span>
   );
 }
