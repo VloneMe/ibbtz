@@ -43,6 +43,7 @@ export interface GalaRegistration {
   rsvp_status: 'attending' | 'declined' | null;
   rsvp_at: string | null;
   complimentary: number;
+  guest_source: 'admin' | 'link' | null;
   created_at: string;
 }
 
@@ -135,5 +136,6 @@ export const adminApi = {
     request<{ success: true; message: string; data: GalaRegistration }>(`/admin/registrations/${id}/email`, { method: 'POST' }, true),
   addGuest: (data: GuestInput) =>
     request<{ success: true; message: string; data: GalaRegistration }>('/admin/guests', { method: 'POST', body: JSON.stringify(data) }, true),
+  guestLink: () => request<{ success: true; url: string | null }>('/admin/guest-link', {}, true),
   csvUrl: () => `${API_BASE}/admin/registrations.csv?token=${encodeURIComponent(adminAuth.getToken() || '')}`,
 };

@@ -6,6 +6,7 @@ import { dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { GALA_QUESTIONS, OTHER } from './questions.js';
 import { sendConfirmationEmail } from './email.js';
+import { guestFormPage, guestLinkInactivePage, guestAlreadyListedPage } from './guestForm.js';
 import { sendInvitationEmail, buildInvitationPage, inactiveInvitationPage, qrPng, newInviteToken, isInviteToken } from './invitation.js';
 
 // ---------------------------------------------------------------------------
@@ -23,6 +24,9 @@ const PORT = Number(process.env.PORT || 5091);
 const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD;
 const TOKEN_SECRET = process.env.TOKEN_SECRET;
 const DB_PATH = resolve(here, process.env.DB_PATH || './data/ibbplus.db');
+// Private guest link: https://ibbplus.com/rsvp/<GUEST_INVITE_CODE>. Unset = link switched off.
+const GUEST_INVITE_CODE = (process.env.GUEST_INVITE_CODE || '').trim();
+const SITE_URL = (process.env.SITE_URL || 'https://ibbplus.com').replace(/\/$/, '');
 const TOKEN_TTL_MS = 7 * 24 * 60 * 60 * 1000;
 
 if (!ADMIN_PASSWORD || !TOKEN_SECRET) {
@@ -80,6 +84,8 @@ db.exec(`CREATE UNIQUE INDEX IF NOT EXISTS idx_gala_invite_token ON gala_registr
 // Invited guests: added from the dashboard, attend without paying, and get the invitation straight away.
 if (!columns.includes('complimentary')) db.exec(`ALTER TABLE gala_registrations ADD COLUMN complimentary INTEGER NOT NULL DEFAULT 0`);
 const GUEST_PAYMENT_METHOD = 'Invited guest';
+// Where a guest came from: 'admin' (added in the dashboard) or 'link' (signed up through the guest link).
+if (!columns.includes('guest_source')) db.exec(`ALTER TABLE gala_registrations ADD COLUMN guest_source TEXT`);
 
 const insertStmt = db.prepare(`
   INSERT INTO gala_registrations
@@ -89,10 +95,11 @@ const insertStmt = db.prepare(`
 `);
 const insertGuestStmt = db.prepare(`
   INSERT INTO gala_registrations
-    (full_name, email, phone, organisation, job_title, registration_type, payment_method, amount, complimentary, invite_token, ref_no)
-  VALUES (?, ?, ?, ?, ?, ?, '${GUEST_PAYMENT_METHOD}', NULL, 1, ?,
+    (full_name, email, phone, organisation, job_title, registration_type, payment_method, amount, complimentary, invite_token, guest_source, ip, user_agent, ref_no)
+  VALUES (?, ?, ?, ?, ?, ?, '${GUEST_PAYMENT_METHOD}', NULL, 1, ?, ?, ?, ?,
     (SELECT COALESCE(MAX(ref_no), ${FIRST_REFERENCE - 1}) + 1 FROM gala_registrations))
 `);
+const guestByEmailStmt = db.prepare(`SELECT id FROM gala_registrations WHERE complimentary = 1 AND email = ? ORDER BY id DESC LIMIT 1`);
 const SELECT_ROW = `SELECT *, 'IBA-' || ref_no AS reference FROM gala_registrations`;
 const getStmt = db.prepare(`${SELECT_ROW} WHERE id = ?`);
 const emailStatusStmt = db.prepare(`UPDATE gala_registrations SET email_status = ?, email_sent_at = COALESCE(?, email_sent_at) WHERE id = ?`);
@@ -239,7 +246,7 @@ const app = express();
 app.set('trust proxy', 'loopback');
 app.disable('x-powered-by');
 app.use(express.json({ limit: '32kb' }));
-app.use('/invite', express.urlencoded({ extended: false, limit: '2kb' }));
+app.use(['/invite', '/rsvp'], express.urlencoded({ extended: false, limit: '4kb' }));
 
 app.get('/api/health', (_req, res) => res.json({ ok: true, service: 'ibbplus-api' }));
 
@@ -307,7 +314,7 @@ app.get('/api/admin/registrations', requireAdmin, (_req, res) => {
 
 app.get('/api/admin/registrations.csv', requireAdmin, (_req, res) => {
   const rows = listStmt.all();
-  const base = ['reference', 'legacy_reference', 'created_at', 'full_name', 'email', 'phone', 'organisation', 'job_title', 'registration_type', 'payment_method', 'amount', 'paid_at', 'invite_status', 'invite_sent_at', 'rsvp_status', 'rsvp_at', 'complimentary'];
+  const base = ['reference', 'legacy_reference', 'created_at', 'full_name', 'email', 'phone', 'organisation', 'job_title', 'registration_type', 'payment_method', 'amount', 'paid_at', 'invite_status', 'invite_sent_at', 'rsvp_status', 'rsvp_at', 'complimentary', 'guest_source'];
   const qCols = GALA_QUESTIONS.map((q) => `q${q.number}_${q.id}`);
   const esc = (v) => { const s = v == null ? '' : String(v); return /[",\n]/.test(s) ? `"${s.replace(/"/g, '""')}"` : s; };
   const rowValues = (r) => {
@@ -355,11 +362,14 @@ app.post('/api/admin/registrations/:id/paid', requireAdmin, rateLimit({ windowMs
   res.json({ success: true, message: `${reg.reference} marked as paid. Invitation sent to ${reg.email}`, data: row });
 });
 
+app.get('/api/admin/guest-link', requireAdmin, (_req, res) =>
+  res.json({ success: true, url: GUEST_INVITE_CODE ? `${SITE_URL}/rsvp/${GUEST_INVITE_CODE}` : null }));
+
 // Add an invited guest (no payment) and email their invitation straight away.
 app.post('/api/admin/guests', requireAdmin, rateLimit({ windowMs: 60_000, max: 30 }), async (req, res) => {
   const { data, errors } = validateGuest(req.body || {});
   if (Object.keys(errors).length) return res.status(400).json({ success: false, message: 'Please correct the highlighted fields.', errors });
-  const result = insertGuestStmt.run(data.full_name, data.email, data.phone, data.organisation, data.job_title, data.registration_type, newInviteToken());
+  const result = insertGuestStmt.run(data.full_name, data.email, data.phone, data.organisation, data.job_title, data.registration_type, newInviteToken(), 'admin', null, null);
   const reg = getStmt.get(Number(result.lastInsertRowid));
   console.log(`[guest] #${reg.id} ${reg.reference} ${reg.email} invited (${reg.registration_type})`);
   const r = await sendInvitationAndRecord(reg);
@@ -413,6 +423,49 @@ app.post('/invite/:token/rsvp', rateLimit({ windowMs: 60_000, max: 20 }), (req, 
   if (wantsJson) return res.json({ success: true, rsvp_status: response, rsvp_at: at });
   res.redirect(303, `/invite/${reg.invite_token}?rsvp=${response}#rsvp`);
 });
+// Self-service guest link: details + RSVP, then straight to the personal invitation page.
+const guestCodeOk = (code) => {
+  if (!GUEST_INVITE_CODE || typeof code !== 'string') return false;
+  const a = Buffer.from(code), b = Buffer.from(GUEST_INVITE_CODE);
+  return a.length === b.length && timingSafeEqual(a, b);
+};
+const noIndex = (res) => res.set({ 'X-Robots-Tag': 'noindex, nofollow', 'Cache-Control': 'no-store', 'Referrer-Policy': 'no-referrer' });
+app.get('/rsvp/:code', rateLimit({ windowMs: 60_000, max: 60 }), (req, res) => {
+  noIndex(res);
+  if (!guestCodeOk(req.params.code)) return res.status(404).type('html').send(guestLinkInactivePage());
+  res.type('html').send(guestFormPage({ action: `/rsvp/${req.params.code}` }));
+});
+app.post('/rsvp/:code', rateLimit({ windowMs: 10 * 60_000, max: 10 }), async (req, res) => {
+  noIndex(res);
+  if (!guestCodeOk(req.params.code)) return res.status(404).type('html').send(guestLinkInactivePage());
+  const body = req.body || {};
+  const action = `/rsvp/${req.params.code}`;
+  if (clean(body.website)) return res.type('html').send(guestAlreadyListedPage(clean(body.email))); // bot trap
+  const { data, errors } = validateGuest({ ...body, registrationType: 'Individual' });
+  if (data.phone.replace(/\D/g, '').length < 7) errors.phone = 'A valid phone number is required';
+  const response = String(body.response || '');
+  if (!RSVP_RESPONSES.includes(response)) errors.response = 'Please choose whether you will attend';
+  if (Object.keys(errors).length) {
+    return res.status(400).type('html').send(guestFormPage({ action, values: { ...body }, errors, message: 'Please check the highlighted fields.' }));
+  }
+  const existing = guestByEmailStmt.get(data.email);
+  if (existing) {
+    // Never reveal someone's invitation link on this public page; email it to the address instead.
+    const reg = getStmt.get(existing.id);
+    console.log(`[guest] link signup for existing guest #${reg.id} ${reg.reference}, invitation re-sent`);
+    sendInvitationAndRecord(reg);
+    return res.type('html').send(guestAlreadyListedPage(data.email));
+  }
+  const result = insertGuestStmt.run(data.full_name, data.email, data.phone, data.organisation, data.job_title, 'Individual',
+    newInviteToken(), 'link', req.ip, clean(req.get('user-agent'), 300) || null);
+  const id = Number(result.lastInsertRowid);
+  rsvpStmt.run(response, new Date().toISOString(), id);
+  const reg = getStmt.get(id);
+  console.log(`[guest] #${id} ${reg.reference} ${reg.email} signed up via guest link (${response})`);
+  sendInvitationAndRecord(reg); // email in the background; the page opens straight away
+  res.redirect(303, `/invite/${reg.invite_token}?rsvp=${response}#rsvp`);
+});
+
 app.get('/invite/:token/qr.png', rateLimit({ windowMs: 60_000, max: 60 }), async (req, res) => {
   const reg = activeInvite(req.params.token);
   if (!reg) return res.status(404).end();
