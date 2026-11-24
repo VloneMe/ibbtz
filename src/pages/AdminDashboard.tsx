@@ -255,17 +255,17 @@ export default function AdminDashboard() {
             <table className="w-full text-sm">
               <thead className="text-left text-ink-muted bg-sand/60">
                 <tr>
-                  {['Reference', 'Submitted', 'Name', 'Contact', 'Organisation', 'Type', 'Amount', 'Email', 'Payment', ''].map((h) => (
+                  {['Reference', 'Name', 'Contact', 'Organisation', 'Type', 'Email', 'Payment', ''].map((h) => (
                     <th key={h} className="px-4 py-3 font-semibold whitespace-nowrap">{h}</th>
                   ))}
                 </tr>
               </thead>
               <tbody>
                 {loading && rows.length === 0 && (
-                  <tr><td colSpan={10} className="px-4 py-10 text-center text-ink-muted"><Loader2 className="h-5 w-5 animate-spin inline mr-2" />Loading...</td></tr>
+                  <tr><td colSpan={8} className="px-4 py-10 text-center text-ink-muted"><Loader2 className="h-5 w-5 animate-spin inline mr-2" />Loading...</td></tr>
                 )}
                 {!loading && filtered.length === 0 && (
-                  <tr><td colSpan={10} className="px-4 py-10 text-center text-ink-muted">{rows.length ? 'No registrations match your search.' : 'No registrations yet.'}</td></tr>
+                  <tr><td colSpan={8} className="px-4 py-10 text-center text-ink-muted">{rows.length ? 'No registrations match your search.' : 'No registrations yet.'}</td></tr>
                 )}
                 {filtered.map((r) => {
                   const { answers, other } = parseInterests(r.interests);
@@ -279,8 +279,8 @@ export default function AdminDashboard() {
                         <span className="font-semibold text-navy whitespace-nowrap">{r.reference}</span>{answered > 0 && (isOpen ? <ChevronUp className="h-3.5 w-3.5" /> : <ChevronDown className="h-3.5 w-3.5" />)}
                       </button>
                       {r.legacy_reference && <div className="mt-0.5 text-[11px] whitespace-nowrap" title="Reference quoted in the first confirmation email">was {r.legacy_reference}</div>}
+                      <div className="mt-1 text-[11px] whitespace-nowrap" title={`Submitted ${fmtDate(r.created_at)}`}>{fmtDate(r.created_at)}</div>
                     </td>
-                    <td className="px-4 py-3 whitespace-nowrap text-ink-muted">{fmtDate(r.created_at)}</td>
                     <td className="px-4 py-3">
                       <div className="font-medium text-ink">{r.full_name}</div>
                       {r.job_title && <div className="text-xs text-ink-muted">{r.job_title}</div>}
@@ -294,8 +294,8 @@ export default function AdminDashboard() {
                       <span className={`px-2 py-1 rounded text-xs font-semibold ${r.registration_type === 'Corporate Table' ? 'bg-gold/20 text-navy' : 'bg-sand text-ink'}`}>
                         {r.registration_type}
                       </span>
+                      <div className="mt-1.5 text-xs text-ink-muted tabular-nums">{r.amount || '—'}</div>
                     </td>
-                    <td className="px-4 py-3 text-ink-muted whitespace-nowrap">{r.amount || '—'}</td>
                     <td className="px-4 py-3 whitespace-nowrap">
                       <EmailStatus row={r} />
                       <div className="mt-1.5">
@@ -364,7 +364,7 @@ export default function AdminDashboard() {
                   </tr>
                   {isOpen && (
                     <tr className="bg-sand/30">
-                      <td colSpan={10} className="px-6 py-5">
+                      <td colSpan={8} className="px-6 py-5">
                         {answered === 0 ? (
                           <p className="text-sm text-ink-muted">This registrant did not answer the interest questions.</p>
                         ) : (
