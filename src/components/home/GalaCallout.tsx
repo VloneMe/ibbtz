@@ -10,10 +10,10 @@ const GalaCallout = () => (
         <div className="lg:col-span-7">
           <p className="eyebrow">Impact Business Awards (IBA)</p>
           <h2 id="gala-title" className="mt-5 font-display text-3xl font-semibold leading-tight text-navy sm:text-4xl">
-            An evening to celebrate the businesses shaping Tanzania's future.
+            A breakfast to celebrate the businesses shaping Tanzania's future.
           </h2>
           <p className="mt-5 text-lg leading-relaxed text-ink-muted">
-            Join fellow leaders at the Impact Business Awards 2026. Register as an individual or reserve a corporate table for your organisation.
+            Join fellow leaders at the Impact Business Awards 2026, The Legacy Code, on 11 December 2026 at 7:30 AM, Hyatt Regency, Dar es Salaam. Register as an individual or reserve a corporate table for your organisation.
           </p>
           <Link to="/award" className="btn-primary mt-8">
             Register now <ArrowRight className="h-4 w-4" />
