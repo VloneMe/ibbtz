@@ -12,13 +12,19 @@ export const PAYBILLS = [
 ];
 const AMOUNT_BY_TYPE = { 'Individual': 'Tsh 150,000', 'Corporate Table': 'Tsh 2,000,000' };
 
-const CONTACT_EMAIL = 'ibb@impactadvisory.co.tz';
-const CONTACT_PHONE = '+255 748 111 183';
+export const CONTACT_EMAIL = 'ibb@impactadvisory.co.tz';
+export const CONTACT_PHONE = '+255 748 111 183';
 const SITE_URL = 'https://ibbplus.com';
+
+/** "KELVIN RAPHAEL" -> "Kelvin Raphael"; names typed in normal or mixed case are left as entered. */
+export const displayName = (name) => {
+  const s = String(name || '').trim();
+  return s === s.toUpperCase() ? s.toLowerCase().replace(/(^|[\s'-])(\p{L})/gu, (m, sep, ch) => sep + ch.toUpperCase()) : s;
+};
 
 export const reference = (reg) => reg.reference || `IBA-${reg.ref_no ?? reg.id}`;
 
-const escapeHtml = (s) => String(s ?? '').replace(/[&<>"']/g, (c) => (
+export const escapeHtml = (s) => String(s ?? '').replace(/[&<>"']/g, (c) => (
   { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]
 ));
 
@@ -46,7 +52,7 @@ export function paymentDeadline(registeredAt, days = PAYMENT_DAYS) {
 }
 
 export function buildConfirmationEmail(reg) {
-  const firstName = reg.full_name.split(/\s+/)[0];
+  const firstName = displayName(reg.full_name).split(/\s+/)[0];
   const ref = reference(reg);
   const amount = reg.amount || AMOUNT_BY_TYPE[reg.registration_type] || '';
   const method = reg.payment_method || 'Mobile Money (Pay Bill)';
@@ -103,7 +109,7 @@ export function buildConfirmationEmail(reg) {
           <tr>
             <td style="padding:36px 32px 8px;">
               <h1 style="margin:0 0 20px;font-family:Georgia,'Times New Roman',serif;font-size:26px;line-height:1.3;font-weight:700;color:${navy};">Thank you for registering, ${escapeHtml(firstName)}</h1>
-              <p style="margin:0 0 16px;font-size:15px;line-height:1.7;">Dear ${escapeHtml(reg.full_name)},</p>
+              <p style="margin:0 0 16px;font-size:15px;line-height:1.7;">Dear ${escapeHtml(displayName(reg.full_name))},</p>
               <p style="margin:0 0 16px;font-size:15px;line-height:1.7;">Thank you for registering for the <strong>Impact Business Awards 2026</strong>. We are delighted that you will join business leaders from across Tanzania as we recognise the organisations and people whose work is creating lasting impact in our economy and communities.</p>
               <p style="margin:0 0 24px;font-size:15px;line-height:1.7;">Your registration has been received. The details you submitted are below.</p>
             </td>
@@ -153,7 +159,7 @@ export function buildConfirmationEmail(reg) {
 </html>`;
 
   const text = [
-    `Dear ${reg.full_name},`,
+    `Dear ${displayName(reg.full_name)},`,
     '',
     'Thank you for registering for the Impact Business Awards 2026. We are delighted that you will join business leaders from across Tanzania as we recognise the organisations and people whose work is creating lasting impact in our economy and communities.',
     '',
@@ -181,28 +187,20 @@ export function buildConfirmationEmail(reg) {
   return { subject, html, text };
 }
 
-/** Sends the confirmation email. Returns { ok, id?, error? }; never throws. */
-export async function sendConfirmationEmail(reg, { idempotencyKey } = {}) {
+/** Sends one email through Resend. Returns { ok, id?, error? }; never throws. */
+export async function sendEmail({ to, subject, html, text, idempotencyKey }) {
   const apiKey = process.env.RESEND_API_KEY;
   const from = process.env.EMAIL_FROM;
   if (!apiKey || !from) return { ok: false, error: 'Email not configured' };
-  const { subject, html, text } = buildConfirmationEmail(reg);
   try {
     const res = await fetch(RESEND_URL, {
       method: 'POST',
       headers: {
         Authorization: `Bearer ${apiKey}`,
         'Content-Type': 'application/json',
-        'Idempotency-Key': idempotencyKey || `iba-registration-${reg.id}`,
+        ...(idempotencyKey ? { 'Idempotency-Key': idempotencyKey } : {}),
       },
-      body: JSON.stringify({
-        from,
-        to: [reg.email],
-        reply_to: process.env.EMAIL_REPLY_TO || CONTACT_EMAIL,
-        subject,
-        html,
-        text,
-      }),
+      body: JSON.stringify({ from, to: [to], reply_to: process.env.EMAIL_REPLY_TO || CONTACT_EMAIL, subject, html, text }),
       signal: AbortSignal.timeout(15_000),
     });
     const body = await res.json().catch(() => ({}));
@@ -211,4 +209,10 @@ export async function sendConfirmationEmail(reg, { idempotencyKey } = {}) {
   } catch (err) {
     return { ok: false, error: err.message };
   }
+}
+
+/** Sends the registration confirmation email. Returns { ok, id?, error? }; never throws. */
+export async function sendConfirmationEmail(reg, { idempotencyKey } = {}) {
+  const { subject, html, text } = buildConfirmationEmail(reg);
+  return sendEmail({ to: reg.email, subject, html, text, idempotencyKey: idempotencyKey || `iba-registration-${reg.id}` });
 }

@@ -37,6 +37,9 @@ export interface GalaRegistration {
   email_sent_at: string | null;
   reference: string;
   legacy_reference: string | null;
+  paid_at: string | null;
+  invite_status: string | null;
+  invite_sent_at: string | null;
   created_at: string;
 }
 
@@ -47,6 +50,8 @@ export interface GalaStats {
   byAmount: Record<string, number>;
   expectedRevenueTsh: number;
   last7Days: number;
+  paid: number;
+  receivedTsh: number;
   byQuestion: Record<string, Record<string, number>>;
 }
 
@@ -105,6 +110,12 @@ export const adminAuth = {
 export const adminApi = {
   list: () => request<{ success: true; stats: GalaStats; data: GalaRegistration[] }>('/admin/registrations', {}, true),
   remove: (id: number) => request<{ success: true }>(`/admin/registrations/${id}`, { method: 'DELETE' }, true),
+  markPaid: (id: number) =>
+    request<{ success: true; message: string; data: GalaRegistration }>(`/admin/registrations/${id}/paid`, { method: 'POST' }, true),
+  markUnpaid: (id: number) =>
+    request<{ success: true; message: string; data: GalaRegistration }>(`/admin/registrations/${id}/unpaid`, { method: 'POST' }, true),
+  sendInvitation: (id: number) =>
+    request<{ success: true; message: string; data: GalaRegistration }>(`/admin/registrations/${id}/invitation`, { method: 'POST' }, true),
   sendEmail: (id: number) =>
     request<{ success: true; message: string; data: GalaRegistration }>(`/admin/registrations/${id}/email`, { method: 'POST' }, true),
   csvUrl: () => `${API_BASE}/admin/registrations.csv?token=${encodeURIComponent(adminAuth.getToken() || '')}`,

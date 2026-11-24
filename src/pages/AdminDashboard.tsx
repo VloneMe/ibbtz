@@ -4,7 +4,7 @@ import { Container } from '../common/Container';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Lock, LogOut, RefreshCw, Download, Search, Trash2, Loader2, Users, User, Building2, Wallet, CalendarClock, AlertCircle, Mail, MailCheck, MailX, CheckCircle2 } from 'lucide-react';
+import { Lock, LogOut, RefreshCw, Download, Search, Trash2, Loader2, Users, User, Building2, Wallet, AlertCircle, Mail, MailCheck, MailX, CheckCircle2, BadgeCheck, Clock, Undo2, Send } from 'lucide-react';
 import { adminApi, adminAuth, ApiError, type GalaRegistration, type GalaStats } from '@/services/galaApi';
 import { GALA_QUESTIONS, OTHER, parseInterests } from '@/data/galaQuestions';
 import { ChevronDown, ChevronUp } from 'lucide-react';
@@ -82,6 +82,9 @@ export default function AdminDashboard() {
   const [pendingEmail, setPendingEmail] = useState<number | null>(null);
   const [sendingEmail, setSendingEmail] = useState<number | null>(null);
   const [notice, setNotice] = useState<string | null>(null);
+  type PayAction = 'paid' | 'invite' | 'unpaid';
+  const [pendingPay, setPendingPay] = useState<{ id: number; action: PayAction } | null>(null);
+  const [busyPay, setBusyPay] = useState<number | null>(null);
 
   useEffect(() => { document.title = 'IBA Registrations | Admin | IBB+'; }, []);
 
@@ -117,6 +120,20 @@ export default function AdminDashboard() {
       if (e.status === 401) setSignedIn(false);
       else { setError(e.message); await load(); }
     } finally { setSendingEmail(null); }
+  };
+
+  const runPayAction = async (id: number, action: PayAction) => {
+    setBusyPay(id); setPendingPay(null); setError(null); setNotice(null);
+    try {
+      const call = action === 'paid' ? adminApi.markPaid : action === 'invite' ? adminApi.sendInvitation : adminApi.markUnpaid;
+      const res = await call(id);
+      setNotice(res.message);
+      await load();
+    } catch (err) {
+      const e = err as ApiError;
+      if (e.status === 401) setSignedIn(false);
+      else { setError(e.message); await load(); }
+    } finally { setBusyPay(null); }
   };
 
   const filtered = useMemo(() => {
@@ -169,9 +186,8 @@ export default function AdminDashboard() {
             <StatCard icon={User} label="Individual" value={types['Individual'] || 0} />
             <StatCard icon={Building2} label="Corporate tables" value={types['Corporate Table'] || 0} />
             <StatCard icon={Wallet} label="Expected revenue" value={fmtTsh(stats.expectedRevenueTsh)} sub="Based on selected amounts" />
-            <StatCard icon={CalendarClock} label="Payment method"
-              value={Object.entries(stats.byPaymentMethod).sort((a, b) => b[1] - a[1])[0]?.[0] || '—'}
-              sub={Object.entries(stats.byPaymentMethod).map(([k, v]) => `${k}: ${v}`).join(' · ') || 'No selections yet'} />
+            <StatCard icon={BadgeCheck} label="Paid" value={`${stats.paid} of ${stats.total}`}
+              sub={`${fmtTsh(stats.receivedTsh)} received`} />
           </div>
         )}
 
@@ -239,17 +255,17 @@ export default function AdminDashboard() {
             <table className="w-full text-sm">
               <thead className="text-left text-ink-muted bg-sand/60">
                 <tr>
-                  {['Reference', 'Submitted', 'Name', 'Contact', 'Organisation', 'Type', 'Amount', 'Email', ''].map((h) => (
+                  {['Reference', 'Submitted', 'Name', 'Contact', 'Organisation', 'Type', 'Amount', 'Email', 'Payment', ''].map((h) => (
                     <th key={h} className="px-4 py-3 font-semibold whitespace-nowrap">{h}</th>
                   ))}
                 </tr>
               </thead>
               <tbody>
                 {loading && rows.length === 0 && (
-                  <tr><td colSpan={9} className="px-4 py-10 text-center text-ink-muted"><Loader2 className="h-5 w-5 animate-spin inline mr-2" />Loading...</td></tr>
+                  <tr><td colSpan={10} className="px-4 py-10 text-center text-ink-muted"><Loader2 className="h-5 w-5 animate-spin inline mr-2" />Loading...</td></tr>
                 )}
                 {!loading && filtered.length === 0 && (
-                  <tr><td colSpan={9} className="px-4 py-10 text-center text-ink-muted">{rows.length ? 'No registrations match your search.' : 'No registrations yet.'}</td></tr>
+                  <tr><td colSpan={10} className="px-4 py-10 text-center text-ink-muted">{rows.length ? 'No registrations match your search.' : 'No registrations yet.'}</td></tr>
                 )}
                 {filtered.map((r) => {
                   const { answers, other } = parseInterests(r.interests);
@@ -299,6 +315,41 @@ export default function AdminDashboard() {
                       </div>
                     </td>
                     <td className="px-4 py-3 whitespace-nowrap">
+                      <PaymentStatus row={r} />
+                      <div className="mt-1.5">
+                        {busyPay === r.id ? (
+                          <span className="inline-flex items-center gap-1 text-xs text-ink-muted"><Loader2 className="h-3.5 w-3.5 animate-spin" />Working…</span>
+                        ) : pendingPay?.id === r.id ? (
+                          <span className="flex flex-col items-start gap-1">
+                            <span className="text-[11px] text-ink-muted">
+                              {pendingPay.action === 'paid' ? 'Mark paid and email the invitation?' : pendingPay.action === 'invite' ? 'Email the invitation again?' : 'Mark as not paid? The invitation link stops working.'}
+                            </span>
+                            <span className="flex gap-1">
+                              <button onClick={() => runPayAction(r.id, pendingPay.action)}
+                                className={`px-2 py-1 rounded text-white text-xs ${pendingPay.action === 'unpaid' ? 'bg-red-600 hover:bg-red-500' : 'bg-navy hover:bg-navy-soft'}`}>Confirm</button>
+                              <button onClick={() => setPendingPay(null)} className="px-2 py-1 rounded bg-sand hover:bg-stone text-xs">Cancel</button>
+                            </span>
+                          </span>
+                        ) : r.paid_at ? (
+                          <span className="flex flex-wrap gap-1">
+                            <button onClick={() => { setPendingPay({ id: r.id, action: 'invite' }); setNotice(null); }} disabled={busyPay !== null}
+                              className="inline-flex items-center gap-1 px-2 py-1 rounded border border-stone text-xs font-semibold text-navy hover:bg-sand disabled:opacity-50">
+                              <Send className="h-3.5 w-3.5" />{r.invite_status === 'sent' ? 'Resend invitation' : 'Send invitation'}
+                            </button>
+                            <button onClick={() => { setPendingPay({ id: r.id, action: 'unpaid' }); setNotice(null); }} disabled={busyPay !== null} title="Undo: mark as not paid"
+                              className="inline-flex items-center px-1.5 py-1 rounded text-xs text-ink-muted hover:text-red-600 hover:bg-red-500/10 disabled:opacity-50">
+                              <Undo2 className="h-3.5 w-3.5" />
+                            </button>
+                          </span>
+                        ) : (
+                          <button onClick={() => { setPendingPay({ id: r.id, action: 'paid' }); setNotice(null); }} disabled={busyPay !== null}
+                            className="inline-flex items-center gap-1 px-2 py-1 rounded bg-navy text-white text-xs font-semibold hover:bg-navy-soft disabled:opacity-50">
+                            <BadgeCheck className="h-3.5 w-3.5" />Mark as paid
+                          </button>
+                        )}
+                      </div>
+                    </td>
+                    <td className="px-4 py-3 whitespace-nowrap">
                       {pendingDelete === r.id ? (
                         <span className="flex gap-1">
                           <button onClick={() => remove(r.id)} className="px-2 py-1 rounded bg-red-600 hover:bg-red-500 text-white text-xs">Confirm</button>
@@ -313,7 +364,7 @@ export default function AdminDashboard() {
                   </tr>
                   {isOpen && (
                     <tr className="bg-sand/30">
-                      <td colSpan={9} className="px-6 py-5">
+                      <td colSpan={10} className="px-6 py-5">
                         {answered === 0 ? (
                           <p className="text-sm text-ink-muted">This registrant did not answer the interest questions.</p>
                         ) : (
@@ -360,6 +411,31 @@ function EmailStatus({ row }: { row: GalaRegistration }) {
   return (
     <span className="inline-flex items-center gap-1 rounded bg-sand px-2 py-1 text-xs font-semibold text-ink-muted">
       <Mail className="h-3.5 w-3.5" />Not sent
+    </span>
+  );
+}
+
+const shortDate = (iso: string) => new Date(iso).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', timeZone: 'Africa/Dar_es_Salaam' });
+
+function PaymentStatus({ row }: { row: GalaRegistration }) {
+  if (!row.paid_at) {
+    return (
+      <span className="inline-flex items-center gap-1 rounded bg-amber-50 px-2 py-1 text-xs font-semibold text-amber-800">
+        <Clock className="h-3.5 w-3.5" />Awaiting payment
+      </span>
+    );
+  }
+  const invite = row.invite_status === 'sent'
+    ? { cls: 'text-green-700', text: `Invitation sent${row.invite_sent_at ? ` · ${shortDate(row.invite_sent_at)}` : ''}` }
+    : row.invite_status?.startsWith('failed')
+      ? { cls: 'text-red-700', text: 'Invitation failed' }
+      : { cls: 'text-ink-muted', text: 'Invitation not sent' };
+  return (
+    <span className="flex flex-col items-start gap-0.5">
+      <span className="inline-flex items-center gap-1 rounded bg-green-50 px-2 py-1 text-xs font-semibold text-green-700" title={`Marked paid ${fmtDate(row.paid_at)}`}>
+        <BadgeCheck className="h-3.5 w-3.5" />Paid · {shortDate(row.paid_at)}
+      </span>
+      <span className={`text-[11px] font-medium ${invite.cls}`} title={row.invite_status || undefined}>{invite.text}</span>
     </span>
   );
 }
