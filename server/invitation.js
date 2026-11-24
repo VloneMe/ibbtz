@@ -84,6 +84,7 @@ export function buildInvitationEmail(reg) {
   const muted = '#5c5144';
   const line = '#c7b18d';
   const firstName = displayName(reg.full_name).split(/\s+/)[0];
+  const guest = Boolean(reg.complimentary);
   const detail = (label, value) => `
                       <td width="33%" align="center" valign="top" style="padding:14px 4px;">
                         <div style="font:bold 9px Arial,sans-serif;letter-spacing:2px;text-transform:uppercase;color:${goldDeep};">${label}</div>
@@ -99,7 +100,7 @@ export function buildInvitationEmail(reg) {
 <title>${escapeHtml(subject)}</title>
 </head>
 <body style="margin:0;padding:0;background:#0b0908;">
-  <div style="display:none;max-height:0;overflow:hidden;">Your place is confirmed. ${EVENT.date}, ${EVENT.time}, ${EVENT.venue}.</div>
+  <div style="display:none;max-height:0;overflow:hidden;">${guest ? 'You are invited.' : 'Your place is confirmed.'} ${EVENT.date}, ${EVENT.time}, ${EVENT.venue}.</div>
   <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:#0b0908;">
     <tr>
       <td align="center" style="padding:28px 12px;">
@@ -115,8 +116,10 @@ export function buildInvitationEmail(reg) {
           <tr>
             <td style="background:${cream};padding:34px 30px 30px;color:${ink};font-family:Georgia,'Times New Roman',serif;">
               <p style="margin:0 0 14px;font:16px/1.7 Georgia,'Times New Roman',serif;">Dear ${escapeHtml(firstName)},</p>
-              <p style="margin:0 0 14px;font:14px/1.75 Arial,sans-serif;color:${muted};">Thank you. We have received your payment of <strong style="color:${ink};">${escapeHtml(reg.amount || '')}</strong> for reference <strong style="color:${ink};">${escapeHtml(ref)}</strong>, and your place at the <strong style="color:${ink};">${EVENT.name}</strong> is confirmed.</p>
-              <p style="margin:0 0 22px;font:14px/1.75 Arial,sans-serif;color:${muted};">It is our pleasure to invite you. Please open your invitation below and <strong style="color:${ink};">let us know whether you will attend</strong>.</p>
+              <p style="margin:0 0 14px;font:14px/1.75 Arial,sans-serif;color:${muted};">${guest
+                ? `It is our pleasure to welcome you as our guest at the <strong style="color:${ink};">${EVENT.name}</strong>. Your place is reserved under reference <strong style="color:${ink};">${escapeHtml(ref)}</strong>.`
+                : `Thank you. We have received your payment of <strong style="color:${ink};">${escapeHtml(reg.amount || '')}</strong> for reference <strong style="color:${ink};">${escapeHtml(ref)}</strong>, and your place at the <strong style="color:${ink};">${EVENT.name}</strong> is confirmed.`}</p>
+              <p style="margin:0 0 22px;font:14px/1.75 Arial,sans-serif;color:${muted};">${guest ? 'We would be honoured by your presence.' : 'It is our pleasure to invite you.'} Please open your invitation below and <strong style="color:${ink};">let us know whether you will attend</strong>.</p>
               <div style="height:1px;width:74px;background:#ad854a;margin:0 auto 22px;"></div>
               <p align="center" style="margin:0 auto 18px;max-width:420px;font:italic 20px/1.5 Georgia,'Times New Roman',serif;color:${ink};text-align:center;">&ldquo;${EVENT.statement}&rdquo;</p>
               <p align="center" style="margin:0 auto 22px;max-width:420px;font:13px/1.8 Arial,sans-serif;color:${muted};text-align:center;">${EVENT.description}</p>
@@ -160,7 +163,9 @@ export function buildInvitationEmail(reg) {
   const text = [
     `Dear ${firstName},`,
     '',
-    `Thank you. We have received your payment of ${reg.amount || ''} for reference ${ref}, and your place at the ${EVENT.name} is confirmed. It is our pleasure to invite you. Please open your invitation and let us know whether you will attend.`,
+    guest
+      ? `It is our pleasure to welcome you as our guest at the ${EVENT.name}. Your place is reserved under reference ${ref}. We would be honoured by your presence. Please open your invitation and let us know whether you will attend.`
+      : `Thank you. We have received your payment of ${reg.amount || ''} for reference ${ref}, and your place at the ${EVENT.name} is confirmed. It is our pleasure to invite you. Please open your invitation and let us know whether you will attend.`,
     '',
     `${EVENT.theme.toUpperCase()} · IBA 2026`,
     `"${EVENT.statement}"`,

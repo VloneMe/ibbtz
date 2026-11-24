@@ -4,8 +4,8 @@ import { Container } from '../common/Container';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Lock, LogOut, RefreshCw, Download, Search, Trash2, Loader2, Users, User, Building2, Wallet, AlertCircle, Mail, MailCheck, MailX, CheckCircle2, BadgeCheck, Clock, Undo2, Send } from 'lucide-react';
-import { adminApi, adminAuth, ApiError, type GalaRegistration, type GalaStats } from '@/services/galaApi';
+import { Lock, LogOut, RefreshCw, Download, Search, Trash2, Loader2, Users, User, Building2, Wallet, AlertCircle, Mail, MailCheck, MailX, CheckCircle2, BadgeCheck, Clock, Undo2, Send, UserPlus, X, Gift } from 'lucide-react';
+import { adminApi, adminAuth, ApiError, type GalaRegistration, type GalaStats, type GuestInput } from '@/services/galaApi';
 import { GALA_QUESTIONS, OTHER, parseInterests } from '@/data/galaQuestions';
 import { ChevronDown, ChevronUp } from 'lucide-react';
 
@@ -86,6 +86,8 @@ export default function AdminDashboard() {
   const [pendingPay, setPendingPay] = useState<{ id: number; action: PayAction } | null>(null);
   const [busyPay, setBusyPay] = useState<number | null>(null);
 
+  const [showGuestForm, setShowGuestForm] = useState(false);
+
   useEffect(() => { document.title = 'IBA Registrations | Admin | IBB+'; }, []);
 
   const load = useCallback(async () => {
@@ -139,7 +141,7 @@ export default function AdminDashboard() {
   const filtered = useMemo(() => {
     const q = query.trim().toLowerCase();
     return rows.filter((r) =>
-      (typeFilter === 'All' || r.registration_type === typeFilter) &&
+      (typeFilter === 'All' || (typeFilter === 'Invited guests' ? r.complimentary : !r.complimentary && r.registration_type === typeFilter)) &&
       (!q || [r.reference, r.legacy_reference, r.full_name, r.email, r.phone, r.organisation, r.job_title, r.payment_method, r.amount, r.interests].some((v) => (v || '').toLowerCase().includes(q))),
     );
   }, [rows, query, typeFilter]);
@@ -163,6 +165,9 @@ export default function AdminDashboard() {
             <p className="text-ink-muted text-sm">Impact Business Awards sign-ups submitted on ibbplus.com</p>
           </div>
           <div className="flex gap-2">
+            <Button onClick={() => { setShowGuestForm((v) => !v); setNotice(null); }} className="btn-primary">
+              <UserPlus className="h-4 w-4 mr-2" />Invite a guest
+            </Button>
             <Button variant="outline" onClick={load} disabled={loading} className="btn-outline">
               <RefreshCw className={`h-4 w-4 mr-2 ${loading ? 'animate-spin' : ''}`} />Refresh
             </Button>
@@ -173,6 +178,14 @@ export default function AdminDashboard() {
           </div>
         </motion.div>
 
+        {showGuestForm && (
+          <GuestForm
+            onCancel={() => setShowGuestForm(false)}
+            onDone={async (message) => { setShowGuestForm(false); setError(null); setNotice(message); setTypeFilter('All'); await load(); }}
+            onAuthLost={() => setSignedIn(false)}
+          />
+        )}
+
         {notice && (
           <div className="mb-6 p-4 bg-green-50 border border-green-200 rounded-lg flex items-center gap-2 text-green-700"><CheckCircle2 className="h-5 w-5" />{notice}</div>
         )}
@@ -182,7 +195,7 @@ export default function AdminDashboard() {
 
         {stats && (
           <div className="grid grid-cols-2 lg:grid-cols-5 gap-4 mb-8">
-            <StatCard icon={Users} label="Total registrations" value={stats.total} sub={`${stats.last7Days} in the last 7 days`} />
+            <StatCard icon={Users} label="Total registrations" value={stats.total} sub={`${stats.last7Days} in the last 7 days · plus ${stats.guests} invited guest${stats.guests === 1 ? '' : 's'}`} />
             <StatCard icon={User} label="Individual" value={types['Individual'] || 0} />
             <StatCard icon={Building2} label="Corporate tables" value={types['Corporate Table'] || 0} />
             <StatCard icon={Wallet} label="Expected revenue" value={fmtTsh(stats.expectedRevenueTsh)} sub="Based on selected amounts" />
@@ -241,7 +254,7 @@ export default function AdminDashboard() {
                 className="field pl-9" />
             </div>
             <div className="flex gap-1">
-              {['All', 'Individual', 'Corporate Table'].map((t) => (
+              {['All', 'Individual', 'Corporate Table', 'Invited guests'].map((t) => (
                 <button key={t} onClick={() => setTypeFilter(t)}
                   className={`px-3 py-1.5 rounded-md text-sm transition-colors ${typeFilter === t ? 'bg-navy text-white' : 'bg-sand text-ink-muted hover:bg-stone'}`}>
                   {t}
@@ -294,9 +307,10 @@ export default function AdminDashboard() {
                       <span className={`px-2 py-1 rounded text-xs font-semibold ${r.registration_type === 'Corporate Table' ? 'bg-gold/20 text-navy' : 'bg-sand text-ink'}`}>
                         {r.registration_type}
                       </span>
-                      <div className="mt-1.5 text-xs text-ink-muted tabular-nums">{r.amount || '—'}</div>
+                      <div className="mt-1.5 text-xs text-ink-muted tabular-nums">{r.complimentary ? 'No payment' : r.amount || '—'}</div>
                     </td>
                     <td className="px-4 py-3 whitespace-nowrap">
+                      {r.complimentary ? <span className="text-xs text-ink-muted" title="Invited guests get the invitation only, not the payment email">Not needed</span> : (<>
                       <EmailStatus row={r} />
                       <div className="mt-1.5">
                         {sendingEmail === r.id ? (
@@ -313,6 +327,7 @@ export default function AdminDashboard() {
                           </button>
                         )}
                       </div>
+                      </>)}
                     </td>
                     <td className="px-4 py-3 whitespace-nowrap">
                       <PaymentStatus row={r} />
@@ -330,16 +345,18 @@ export default function AdminDashboard() {
                               <button onClick={() => setPendingPay(null)} className="px-2 py-1 rounded bg-sand hover:bg-stone text-xs">Cancel</button>
                             </span>
                           </span>
-                        ) : r.paid_at ? (
+                        ) : r.paid_at || r.complimentary ? (
                           <span className="flex flex-wrap gap-1">
                             <button onClick={() => { setPendingPay({ id: r.id, action: 'invite' }); setNotice(null); }} disabled={busyPay !== null}
                               className="inline-flex items-center gap-1 px-2 py-1 rounded border border-stone text-xs font-semibold text-navy hover:bg-sand disabled:opacity-50">
                               <Send className="h-3.5 w-3.5" />{r.invite_status === 'sent' ? 'Resend invitation' : 'Send invitation'}
                             </button>
+                            {!r.complimentary && (
                             <button onClick={() => { setPendingPay({ id: r.id, action: 'unpaid' }); setNotice(null); }} disabled={busyPay !== null} title="Undo: mark as not paid"
                               className="inline-flex items-center px-1.5 py-1 rounded text-xs text-ink-muted hover:text-red-600 hover:bg-red-500/10 disabled:opacity-50">
                               <Undo2 className="h-3.5 w-3.5" />
                             </button>
+                            )}
                           </span>
                         ) : (
                           <button onClick={() => { setPendingPay({ id: r.id, action: 'paid' }); setNotice(null); }} disabled={busyPay !== null}
@@ -418,7 +435,7 @@ function EmailStatus({ row }: { row: GalaRegistration }) {
 const shortDate = (iso: string) => new Date(iso).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', timeZone: 'Africa/Dar_es_Salaam' });
 
 function PaymentStatus({ row }: { row: GalaRegistration }) {
-  if (!row.paid_at) {
+  if (!row.paid_at && !row.complimentary) {
     return (
       <span className="inline-flex items-center gap-1 rounded bg-amber-50 px-2 py-1 text-xs font-semibold text-amber-800">
         <Clock className="h-3.5 w-3.5" />Awaiting payment
@@ -437,11 +454,84 @@ function PaymentStatus({ row }: { row: GalaRegistration }) {
       : { cls: 'text-ink-muted', text: 'RSVP: No reply yet' };
   return (
     <span className="flex flex-col items-start gap-0.5">
-      <span className="inline-flex items-center gap-1 rounded bg-green-50 px-2 py-1 text-xs font-semibold text-green-700" title={`Marked paid ${fmtDate(row.paid_at)}`}>
-        <BadgeCheck className="h-3.5 w-3.5" />Paid · {shortDate(row.paid_at)}
-      </span>
+      {row.paid_at ? (
+        <span className="inline-flex items-center gap-1 rounded bg-green-50 px-2 py-1 text-xs font-semibold text-green-700" title={`Marked paid ${fmtDate(row.paid_at)}`}>
+          <BadgeCheck className="h-3.5 w-3.5" />Paid · {shortDate(row.paid_at)}
+        </span>
+      ) : (
+        <span className="inline-flex items-center gap-1 rounded bg-gold/20 px-2 py-1 text-xs font-semibold text-navy" title={`Added ${fmtDate(row.created_at)}`}>
+          <Gift className="h-3.5 w-3.5" />Invited guest
+        </span>
+      )}
       <span className={`text-[11px] font-medium ${invite.cls}`} title={row.invite_status || undefined}>{invite.text}</span>
       <span className={`text-[11px] font-medium ${rsvp.cls}`} title={row.rsvp_at ? `Replied ${fmtDate(row.rsvp_at)}` : undefined}>{rsvp.text}</span>
     </span>
+  );
+}
+
+const EMPTY_GUEST: GuestInput = { fullName: '', email: '', phone: '', organisation: '', jobTitle: '', registrationType: 'Individual' };
+
+function GuestForm({ onCancel, onDone, onAuthLost }: { onCancel: () => void; onDone: (message: string) => void; onAuthLost: () => void }) {
+  const [form, setForm] = useState<GuestInput>(EMPTY_GUEST);
+  const [errors, setErrors] = useState<Record<string, string>>({});
+  const [formError, setFormError] = useState<string | null>(null);
+  const [saving, setSaving] = useState(false);
+  const set = (k: keyof GuestInput) => (e: { target: { value: string } }) => setForm((f) => ({ ...f, [k]: e.target.value }));
+
+  const submit = async (e: FormEvent) => {
+    e.preventDefault();
+    setSaving(true); setErrors({}); setFormError(null);
+    try {
+      const res = await adminApi.addGuest(form);
+      onDone(res.message);
+    } catch (err) {
+      const ae = err as ApiError;
+      if (ae.status === 401) onAuthLost();
+      else if (ae.status === 502) onDone(ae.message);
+      else { setErrors(ae.fieldErrors || {}); setFormError(ae.message); }
+    } finally { setSaving(false); }
+  };
+
+  const field = (k: keyof GuestInput, label: string, opts: { type?: string; required?: boolean; placeholder?: string } = {}) => (
+    <div>
+      <Label htmlFor={`guest-${k}`} className="text-sm font-medium text-ink">{label}{opts.required && <span className="text-red-600"> *</span>}</Label>
+      <Input id={`guest-${k}`} type={opts.type || 'text'} value={form[k]} onChange={set(k)} required={opts.required} placeholder={opts.placeholder} className="field mt-1" />
+      {errors[k] && <p className="mt-1 text-xs text-red-600">{errors[k]}</p>}
+    </div>
+  );
+
+  return (
+    <motion.form initial={{ opacity: 0, y: -8 }} animate={{ opacity: 1, y: 0 }} onSubmit={submit}
+      className="mb-8 rounded-sm border border-gold/60 bg-white p-6">
+      <div className="flex items-start justify-between gap-4">
+        <div>
+          <h2 className="font-display text-xl font-semibold text-navy">Invite a guest</h2>
+          <p className="mt-1 text-sm text-ink-muted">For guests attending without payment. They get the invitation email with the RSVP and entry pass straight away, and no payment email.</p>
+        </div>
+        <button type="button" onClick={onCancel} title="Close" className="p-1.5 rounded text-ink-muted hover:bg-sand"><X className="h-4 w-4" /></button>
+      </div>
+      <div className="mt-5 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+        {field('fullName', 'Full name', { required: true })}
+        {field('email', 'Email', { type: 'email', required: true })}
+        {field('phone', 'Phone', { type: 'tel', placeholder: 'Optional' })}
+        {field('organisation', 'Organisation', { placeholder: 'Optional' })}
+        {field('jobTitle', 'Job title', { placeholder: 'Optional' })}
+        <div>
+          <Label htmlFor="guest-registrationType" className="text-sm font-medium text-ink">Admits</Label>
+          <select id="guest-registrationType" value={form.registrationType} onChange={set('registrationType')}
+            className="field mt-1 h-10 w-full rounded-md border border-stone bg-white px-3 text-sm">
+            <option value="Individual">One guest (Individual)</option>
+            <option value="Corporate Table">A corporate table</option>
+          </select>
+        </div>
+      </div>
+      {formError && <p className="mt-4 text-sm text-red-600">{formError}</p>}
+      <div className="mt-6 flex gap-2">
+        <Button type="submit" disabled={saving} className="btn-primary">
+          {saving ? <Loader2 className="h-4 w-4 mr-2 animate-spin" /> : <Send className="h-4 w-4 mr-2" />}{saving ? 'Sending…' : 'Add and send invitation'}
+        </Button>
+        <Button type="button" variant="outline" onClick={onCancel} className="btn-outline">Cancel</Button>
+      </div>
+    </motion.form>
   );
 }

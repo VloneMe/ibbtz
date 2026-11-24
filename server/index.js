@@ -77,11 +77,20 @@ for (const [col, type] of [['paid_at', 'TEXT'], ['invite_token', 'TEXT'], ['invi
   if (!columns.includes(col)) db.exec(`ALTER TABLE gala_registrations ADD COLUMN ${col} ${type}`);
 }
 db.exec(`CREATE UNIQUE INDEX IF NOT EXISTS idx_gala_invite_token ON gala_registrations(invite_token)`);
+// Invited guests: added from the dashboard, attend without paying, and get the invitation straight away.
+if (!columns.includes('complimentary')) db.exec(`ALTER TABLE gala_registrations ADD COLUMN complimentary INTEGER NOT NULL DEFAULT 0`);
+const GUEST_PAYMENT_METHOD = 'Invited guest';
 
 const insertStmt = db.prepare(`
   INSERT INTO gala_registrations
     (full_name, email, phone, organisation, job_title, registration_type, payment_method, amount, interests, ip, user_agent, ref_no)
   VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?,
+    (SELECT COALESCE(MAX(ref_no), ${FIRST_REFERENCE - 1}) + 1 FROM gala_registrations))
+`);
+const insertGuestStmt = db.prepare(`
+  INSERT INTO gala_registrations
+    (full_name, email, phone, organisation, job_title, registration_type, payment_method, amount, complimentary, invite_token, ref_no)
+  VALUES (?, ?, ?, ?, ?, ?, '${GUEST_PAYMENT_METHOD}', NULL, 1, ?,
     (SELECT COALESCE(MAX(ref_no), ${FIRST_REFERENCE - 1}) + 1 FROM gala_registrations))
 `);
 const SELECT_ROW = `SELECT *, 'IBA-' || ref_no AS reference FROM gala_registrations`;
@@ -119,6 +128,22 @@ export const AMOUNTS = ['Tsh 150,000', 'Tsh 2,000,000'];
 const AMOUNT_BY_TYPE = { 'Individual': 'Tsh 150,000', 'Corporate Table': 'Tsh 2,000,000' };
 
 const clean = (v, max = 200) => (typeof v === 'string' ? v.trim().slice(0, max) : '');
+
+function validateGuest(body) {
+  const errors = {};
+  const data = {
+    full_name: clean(body.fullName),
+    email: clean(body.email).toLowerCase(),
+    phone: clean(body.phone, 40),
+    organisation: clean(body.organisation),
+    job_title: clean(body.jobTitle) || null,
+    registration_type: clean(body.registrationType, 40) || REGISTRATION_TYPES[0],
+  };
+  if (data.full_name.length < 2) errors.fullName = 'Full name is required';
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(data.email)) errors.email = 'A valid email address is required';
+  if (!REGISTRATION_TYPES.includes(data.registration_type)) errors.registrationType = 'Please choose a registration type';
+  return { data, errors };
+}
 
 function validateRegistration(body) {
   const errors = {};
@@ -249,10 +274,17 @@ app.post('/api/admin/login', rateLimit({ windowMs: 15 * 60_000, max: 20 }), (req
 });
 
 app.get('/api/admin/registrations', requireAdmin, (_req, res) => {
-  const rows = listStmt.all();
+  const all = listStmt.all();
+  let rows = all;
   const countBy = (key) => rows.reduce((acc, r) => { const k = r[key] || 'Not specified'; acc[k] = (acc[k] || 0) + 1; return acc; }, {});
   const amountValue = (a) => Number(String(a || '').replace(/\D/g, '')) || 0;
+  const guests = rows.filter((r) => r.complimentary);
+  const invited = rows.filter((r) => r.paid_at || r.complimentary);
+  rows = rows.filter((r) => !r.complimentary);
   const stats = {
+    guests: guests.length,
+    attending: invited.filter((r) => r.rsvp_status === 'attending').length,
+    declined: invited.filter((r) => r.rsvp_status === 'declined').length,
     total: rows.length,
     byRegistrationType: countBy('registration_type'),
     byPaymentMethod: countBy('payment_method'),
@@ -260,8 +292,6 @@ app.get('/api/admin/registrations', requireAdmin, (_req, res) => {
     expectedRevenueTsh: rows.reduce((sum, r) => sum + amountValue(r.amount), 0),
     paid: rows.filter((r) => r.paid_at).length,
     receivedTsh: rows.filter((r) => r.paid_at).reduce((sum, r) => sum + amountValue(r.amount), 0),
-    attending: rows.filter((r) => r.paid_at && r.rsvp_status === 'attending').length,
-    declined: rows.filter((r) => r.paid_at && r.rsvp_status === 'declined').length,
     last7Days: rows.filter((r) => Date.now() - Date.parse(r.created_at) < 7 * 86_400_000).length,
     byQuestion: Object.fromEntries(GALA_QUESTIONS.map((q) => [q.id, {}])),
   };
@@ -272,12 +302,12 @@ app.get('/api/admin/registrations', requireAdmin, (_req, res) => {
       for (const opt of parsed[q.id] || []) stats.byQuestion[q.id][opt] = (stats.byQuestion[q.id][opt] || 0) + 1;
     }
   }
-  res.json({ success: true, stats, data: rows });
+  res.json({ success: true, stats, data: all });
 });
 
 app.get('/api/admin/registrations.csv', requireAdmin, (_req, res) => {
   const rows = listStmt.all();
-  const base = ['reference', 'legacy_reference', 'created_at', 'full_name', 'email', 'phone', 'organisation', 'job_title', 'registration_type', 'payment_method', 'amount', 'paid_at', 'invite_status', 'invite_sent_at', 'rsvp_status', 'rsvp_at'];
+  const base = ['reference', 'legacy_reference', 'created_at', 'full_name', 'email', 'phone', 'organisation', 'job_title', 'registration_type', 'payment_method', 'amount', 'paid_at', 'invite_status', 'invite_sent_at', 'rsvp_status', 'rsvp_at', 'complimentary'];
   const qCols = GALA_QUESTIONS.map((q) => `q${q.number}_${q.id}`);
   const esc = (v) => { const s = v == null ? '' : String(v); return /[",\n]/.test(s) ? `"${s.replace(/"/g, '""')}"` : s; };
   const rowValues = (r) => {
@@ -316,6 +346,7 @@ const findRegistration = (req, res) => {
 // Mark a registration as paid and send the invitation.
 app.post('/api/admin/registrations/:id/paid', requireAdmin, rateLimit({ windowMs: 60_000, max: 20 }), async (req, res) => {
   const found = findRegistration(req, res); if (!found) return;
+  if (found.complimentary) return res.status(409).json({ success: false, message: 'This is an invited guest, so no payment is needed', data: found });
   markPaidStmt.run(new Date().toISOString(), newInviteToken(), found.id);
   const reg = getStmt.get(found.id);
   const r = await sendInvitationAndRecord(reg);
@@ -324,10 +355,23 @@ app.post('/api/admin/registrations/:id/paid', requireAdmin, rateLimit({ windowMs
   res.json({ success: true, message: `${reg.reference} marked as paid. Invitation sent to ${reg.email}`, data: row });
 });
 
-// Resend the invitation to a paid registrant.
+// Add an invited guest (no payment) and email their invitation straight away.
+app.post('/api/admin/guests', requireAdmin, rateLimit({ windowMs: 60_000, max: 30 }), async (req, res) => {
+  const { data, errors } = validateGuest(req.body || {});
+  if (Object.keys(errors).length) return res.status(400).json({ success: false, message: 'Please correct the highlighted fields.', errors });
+  const result = insertGuestStmt.run(data.full_name, data.email, data.phone, data.organisation, data.job_title, data.registration_type, newInviteToken());
+  const reg = getStmt.get(Number(result.lastInsertRowid));
+  console.log(`[guest] #${reg.id} ${reg.reference} ${reg.email} invited (${reg.registration_type})`);
+  const r = await sendInvitationAndRecord(reg);
+  const row = getStmt.get(reg.id);
+  if (!r.ok) return res.status(502).json({ success: false, message: `${reg.reference} added, but the invitation was not sent: ${r.error}. Use Resend invitation to try again.`, data: row });
+  res.status(201).json({ success: true, message: `${reg.reference} added. Invitation sent to ${reg.email}`, data: row });
+});
+
+// Resend the invitation to a paid registrant or invited guest.
 app.post('/api/admin/registrations/:id/invitation', requireAdmin, rateLimit({ windowMs: 60_000, max: 20 }), async (req, res) => {
   const reg = findRegistration(req, res); if (!reg) return;
-  if (!reg.paid_at || !reg.invite_token) return res.status(409).json({ success: false, message: 'Mark this registration as paid first', data: reg });
+  if ((!reg.paid_at && !reg.complimentary) || !reg.invite_token) return res.status(409).json({ success: false, message: 'Mark this registration as paid first', data: reg });
   const r = await sendInvitationAndRecord(reg);
   const row = getStmt.get(reg.id);
   if (!r.ok) return res.status(502).json({ success: false, message: `Invitation not sent: ${r.error}`, data: row });
@@ -337,6 +381,7 @@ app.post('/api/admin/registrations/:id/invitation', requireAdmin, rateLimit({ wi
 // Undo a payment marked by mistake. The invitation link stops working until marked paid again.
 app.post('/api/admin/registrations/:id/unpaid', requireAdmin, (req, res) => {
   const reg = findRegistration(req, res); if (!reg) return;
+  if (reg.complimentary) return res.status(409).json({ success: false, message: 'Invited guests have no payment to undo. Delete the guest to withdraw the invitation.', data: reg });
   markUnpaidStmt.run(reg.id);
   console.log(`[invite] registration #${reg.id} ${reg.reference} marked unpaid`);
   res.json({ success: true, message: `${reg.reference} marked as not paid. Its invitation link is now inactive.`, data: getStmt.get(reg.id) });
@@ -346,7 +391,7 @@ app.post('/api/admin/registrations/:id/unpaid', requireAdmin, (req, res) => {
 const activeInvite = (token) => {
   if (!isInviteToken(token)) return null;
   const reg = byTokenStmt.get(token);
-  return reg && reg.paid_at ? reg : null;
+  return reg && (reg.paid_at || reg.complimentary) ? reg : null;
 };
 app.get('/invite/:token', rateLimit({ windowMs: 60_000, max: 60 }), async (req, res) => {
   res.set({ 'X-Robots-Tag': 'noindex, nofollow', 'Cache-Control': 'no-store', 'Referrer-Policy': 'no-referrer' });
@@ -380,6 +425,7 @@ app.post('/api/admin/registrations/:id/email', requireAdmin, rateLimit({ windowM
   if (!Number.isInteger(id)) return res.status(400).json({ success: false, message: 'Invalid id' });
   const reg = getStmt.get(id);
   if (!reg) return res.status(404).json({ success: false, message: 'Not found' });
+  if (reg.complimentary) return res.status(409).json({ success: false, message: 'Invited guests do not get the payment email. Use Resend invitation instead.', data: reg });
   const r = await sendAndRecord({ ...reg, created_at: new Date().toISOString() },
     { idempotencyKey: `iba-registration-${id}-manual-${Date.now()}` });
   const row = getStmt.get(id);

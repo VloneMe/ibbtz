@@ -42,7 +42,17 @@ export interface GalaRegistration {
   invite_sent_at: string | null;
   rsvp_status: 'attending' | 'declined' | null;
   rsvp_at: string | null;
+  complimentary: number;
   created_at: string;
+}
+
+export interface GuestInput {
+  fullName: string;
+  email: string;
+  phone: string;
+  organisation: string;
+  jobTitle: string;
+  registrationType: 'Individual' | 'Corporate Table';
 }
 
 export interface GalaStats {
@@ -55,6 +65,7 @@ export interface GalaStats {
   paid: number;
   receivedTsh: number;
   attending: number;
+  guests: number;
   declined: number;
   byQuestion: Record<string, Record<string, number>>;
 }
@@ -122,5 +133,7 @@ export const adminApi = {
     request<{ success: true; message: string; data: GalaRegistration }>(`/admin/registrations/${id}/invitation`, { method: 'POST' }, true),
   sendEmail: (id: number) =>
     request<{ success: true; message: string; data: GalaRegistration }>(`/admin/registrations/${id}/email`, { method: 'POST' }, true),
+  addGuest: (data: GuestInput) =>
+    request<{ success: true; message: string; data: GalaRegistration }>('/admin/guests', { method: 'POST', body: JSON.stringify(data) }, true),
   csvUrl: () => `${API_BASE}/admin/registrations.csv?token=${encodeURIComponent(adminAuth.getToken() || '')}`,
 };
