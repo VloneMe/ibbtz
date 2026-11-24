@@ -35,6 +35,8 @@ export interface GalaRegistration {
   interests: string | null;
   email_status: string | null;
   email_sent_at: string | null;
+  reference: string;
+  legacy_reference: string | null;
   created_at: string;
 }
 
@@ -81,7 +83,7 @@ async function request<T>(path: string, init: RequestInit = {}, auth = false): P
 
 export const galaApi = {
   submit: (data: GalaRegistrationInput) =>
-    request<{ success: true; message: string; data: { id: number } }>('/gala/registrations', {
+    request<{ success: true; message: string; data: { id: number; reference: string } }>('/gala/registrations', {
       method: 'POST',
       body: JSON.stringify(data),
     }),

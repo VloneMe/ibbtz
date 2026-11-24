@@ -123,7 +123,7 @@ export default function AdminDashboard() {
     const q = query.trim().toLowerCase();
     return rows.filter((r) =>
       (typeFilter === 'All' || r.registration_type === typeFilter) &&
-      (!q || [r.full_name, r.email, r.phone, r.organisation, r.job_title, r.payment_method, r.amount, r.interests].some((v) => (v || '').toLowerCase().includes(q))),
+      (!q || [r.reference, r.legacy_reference, r.full_name, r.email, r.phone, r.organisation, r.job_title, r.payment_method, r.amount, r.interests].some((v) => (v || '').toLowerCase().includes(q))),
     );
   }, [rows, query, typeFilter]);
 
@@ -239,7 +239,7 @@ export default function AdminDashboard() {
             <table className="w-full text-sm">
               <thead className="text-left text-ink-muted bg-sand/60">
                 <tr>
-                  {['#', 'Submitted', 'Name', 'Contact', 'Organisation', 'Type', 'Amount', 'Email', ''].map((h) => (
+                  {['Reference', 'Submitted', 'Name', 'Contact', 'Organisation', 'Type', 'Amount', 'Email', ''].map((h) => (
                     <th key={h} className="px-4 py-3 font-semibold whitespace-nowrap">{h}</th>
                   ))}
                 </tr>
@@ -260,8 +260,9 @@ export default function AdminDashboard() {
                   <tr className="border-t border-stone hover:bg-sand/40 align-top">
                     <td className="px-4 py-3 text-ink-muted">
                       <button type="button" onClick={() => setExpanded(isOpen ? null : r.id)} title={answered ? `${answered} interest answers` : 'No interest answers'} className="flex items-center gap-1 hover:text-navy">
-                        {r.id}{answered > 0 && (isOpen ? <ChevronUp className="h-3.5 w-3.5" /> : <ChevronDown className="h-3.5 w-3.5" />)}
+                        <span className="font-semibold text-navy whitespace-nowrap">{r.reference}</span>{answered > 0 && (isOpen ? <ChevronUp className="h-3.5 w-3.5" /> : <ChevronDown className="h-3.5 w-3.5" />)}
                       </button>
+                      {r.legacy_reference && <div className="mt-0.5 text-[11px] whitespace-nowrap" title="Reference quoted in the first confirmation email">was {r.legacy_reference}</div>}
                     </td>
                     <td className="px-4 py-3 whitespace-nowrap text-ink-muted">{fmtDate(r.created_at)}</td>
                     <td className="px-4 py-3">

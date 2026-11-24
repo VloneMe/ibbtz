@@ -16,7 +16,7 @@ const CONTACT_EMAIL = 'ibb@impactadvisory.co.tz';
 const CONTACT_PHONE = '+255 748 111 183';
 const SITE_URL = 'https://ibbplus.com';
 
-export const reference = (id) => `IBA-${String(id).padStart(4, '0')}`;
+export const reference = (reg) => reg.reference || `IBA-${reg.ref_no ?? reg.id}`;
 
 const escapeHtml = (s) => String(s ?? '').replace(/[&<>"']/g, (c) => (
   { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]
@@ -47,7 +47,7 @@ export function paymentDeadline(registeredAt, days = PAYMENT_DAYS) {
 
 export function buildConfirmationEmail(reg) {
   const firstName = reg.full_name.split(/\s+/)[0];
-  const ref = reference(reg.id);
+  const ref = reference(reg);
   const amount = reg.amount || AMOUNT_BY_TYPE[reg.registration_type] || '';
   const method = reg.payment_method || 'Mobile Money (Pay Bill)';
   const deadline = paymentDeadline(new Date(reg.created_at || Date.now()));

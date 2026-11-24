@@ -59,13 +59,27 @@ if (!columns.includes('interests')) db.exec(`ALTER TABLE gala_registrations ADD 
 // Confirmation email outcome: 'sent', 'failed: <reason>', or NULL for rows before emails existed.
 if (!columns.includes('email_status')) db.exec(`ALTER TABLE gala_registrations ADD COLUMN email_status TEXT`);
 if (!columns.includes('email_sent_at')) db.exec(`ALTER TABLE gala_registrations ADD COLUMN email_sent_at TEXT`);
+// Public reference numbers run IBA-101, IBA-102, ... in registration order.
+const FIRST_REFERENCE = 101;
+if (!columns.includes('ref_no')) {
+  db.exec(`ALTER TABLE gala_registrations ADD COLUMN ref_no INTEGER`);
+  // Earlier emails quoted IBA-<row id padded to 4 digits>; keep that so old references still match.
+  db.exec(`ALTER TABLE gala_registrations ADD COLUMN legacy_reference TEXT`);
+  db.exec(`UPDATE gala_registrations SET legacy_reference = 'IBA-' || substr('0000' || id, -4) WHERE email_status IS NOT NULL`);
+  const setRef = db.prepare(`UPDATE gala_registrations SET ref_no = ? WHERE id = ?`);
+  db.prepare(`SELECT id FROM gala_registrations ORDER BY created_at, id`).all()
+    .forEach((r, i) => setRef.run(FIRST_REFERENCE + i, r.id));
+}
+db.exec(`CREATE UNIQUE INDEX IF NOT EXISTS idx_gala_ref_no ON gala_registrations(ref_no)`);
 
 const insertStmt = db.prepare(`
   INSERT INTO gala_registrations
-    (full_name, email, phone, organisation, job_title, registration_type, payment_method, amount, interests, ip, user_agent)
-  VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+    (full_name, email, phone, organisation, job_title, registration_type, payment_method, amount, interests, ip, user_agent, ref_no)
+  VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?,
+    (SELECT COALESCE(MAX(ref_no), ${FIRST_REFERENCE - 1}) + 1 FROM gala_registrations))
 `);
-const getStmt = db.prepare(`SELECT * FROM gala_registrations WHERE id = ?`);
+const SELECT_ROW = `SELECT *, 'IBA-' || ref_no AS reference FROM gala_registrations`;
+const getStmt = db.prepare(`${SELECT_ROW} WHERE id = ?`);
 const emailStatusStmt = db.prepare(`UPDATE gala_registrations SET email_status = ?, email_sent_at = COALESCE(?, email_sent_at) WHERE id = ?`);
 /** Sends the confirmation email for a registration and records the outcome. */
 async function sendAndRecord(reg, options) {
@@ -74,7 +88,7 @@ async function sendAndRecord(reg, options) {
   console.log(`[email] registration #${reg.id} ${r.ok ? `sent (${r.id})` : `failed: ${r.error}`}`);
   return r;
 }
-const listStmt = db.prepare(`SELECT * FROM gala_registrations ORDER BY created_at DESC, id DESC`);
+const listStmt = db.prepare(`${SELECT_ROW} ORDER BY created_at DESC, id DESC`);
 const deleteStmt = db.prepare(`DELETE FROM gala_registrations WHERE id = ?`);
 
 // ---------------------------------------------------------------------------
@@ -198,11 +212,11 @@ app.post('/api/gala/registrations', rateLimit({ windowMs: 60_000, max: 10 }), (r
     req.ip, clean(req.get('user-agent'), 300) || null,
   );
   const id = Number(result.lastInsertRowid);
-  console.log(`[gala] registration #${id} ${data.email} (${data.registration_type})`);
-  res.status(201).json({ success: true, message: 'Registration received', data: { id } });
+  const reg = getStmt.get(id);
+  console.log(`[gala] registration #${id} ${reg.reference} ${data.email} (${data.registration_type})`);
+  res.status(201).json({ success: true, message: 'Registration received', data: { id, reference: reg.reference } });
 
   // Send the confirmation after responding, so email problems never block a registration.
-  const reg = getStmt.get(id);
   sendAndRecord(reg);
 });
 
@@ -239,7 +253,7 @@ app.get('/api/admin/registrations', requireAdmin, (_req, res) => {
 
 app.get('/api/admin/registrations.csv', requireAdmin, (_req, res) => {
   const rows = listStmt.all();
-  const base = ['id', 'created_at', 'full_name', 'email', 'phone', 'organisation', 'job_title', 'registration_type', 'payment_method', 'amount'];
+  const base = ['reference', 'legacy_reference', 'created_at', 'full_name', 'email', 'phone', 'organisation', 'job_title', 'registration_type', 'payment_method', 'amount'];
   const qCols = GALA_QUESTIONS.map((q) => `q${q.number}_${q.id}`);
   const esc = (v) => { const s = v == null ? '' : String(v); return /[",\n]/.test(s) ? `"${s.replace(/"/g, '""')}"` : s; };
   const rowValues = (r) => {
@@ -253,7 +267,7 @@ app.get('/api/admin/registrations.csv', requireAdmin, (_req, res) => {
   };
   const csv = [[...base, ...qCols].join(','), ...rows.map(rowValues)].join('\n');
   res.setHeader('Content-Type', 'text/csv; charset=utf-8');
-  res.setHeader('Content-Disposition', `attachment; filename="gala-registrations-${new Date().toISOString().slice(0, 10)}.csv"`);
+  res.setHeader('Content-Disposition', `attachment; filename="iba-registrations-${new Date().toISOString().slice(0, 10)}.csv"`);
   res.send('﻿' + csv);
 });
 

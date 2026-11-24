@@ -26,7 +26,7 @@ const SUGGESTED_AMOUNT: Record<(typeof REGISTRATION_TYPES)[number], (typeof AMOU
 export default function GalaRegistrationForm({ className = '' }: { className?: string }) {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [submittedId, setSubmittedId] = useState<number | null>(null);
+  const [submittedRef, setSubmittedRef] = useState<string | null>(null);
 
   const { register, handleSubmit, control, setValue, setError: setFieldError, watch, formState: { errors } } =
     useForm<GalaRegistrationInput>({
@@ -40,7 +40,7 @@ export default function GalaRegistrationForm({ className = '' }: { className?: s
     setError(null);
     try {
       const res = await galaApi.submit(data);
-      setSubmittedId(res.data.id);
+      setSubmittedRef(res.data.reference);
     } catch (e) {
       const err = e as ApiError;
       if (err.fieldErrors) {
@@ -54,7 +54,7 @@ export default function GalaRegistrationForm({ className = '' }: { className?: s
     }
   };
 
-  if (submittedId !== null) {
+  if (submittedRef !== null) {
     return (
       <div className={`bg-white p-6 sm:p-8 rounded-sm border border-stone ${className}`}>
         <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="text-center py-8 sm:py-12">
@@ -67,7 +67,7 @@ export default function GalaRegistrationForm({ className = '' }: { className?: s
           <p className="text-lg text-ink-muted mb-6 max-w-2xl mx-auto leading-relaxed">
             Thank you for registering for the Impact Business Awards. Please complete your payment using the details below, quoting your reference. Our team will confirm by email.
           </p>
-          <p className="text-sm font-semibold text-green-700">Reference: IBA-{String(submittedId).padStart(4, '0')}</p>
+          <p className="text-sm font-semibold text-green-700">Reference: {submittedRef}</p>
           <div className="mx-auto mt-6 max-w-md text-left">
             <PayBillDetails />
           </div>
